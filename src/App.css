@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+.score-container {
+  font-size: 18px;
+}
+
+.gameboard {
+  background-color: #FFFFFF;
+  border: solid #000000;
+}
+
+.title {
+  font-size: 24px;
+  margin-top: 10px;
+}
