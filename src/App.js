@@ -1,7 +1,19 @@
 import { useEffect } from 'react';
 
 import { Snake, DIRECTIONS, OPPOSITE_DIRECTIONS, TOKEN_TYPE } from './game/snake.js'
-import SNAKE_HEAD_IMAGE from './assets/square.png';
+import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
+import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
+import SNAKE_HEAD_UP from './assets/snake-head-up.png';
+import SNAKE_HEAD_DOWN from './assets/snake-head-down.png';
+import SNAKE_TAIL_LEFT from './assets/snake-tail-left.png';
+import SNAKE_TAIL_RIGHT from './assets/snake-tail-right.png';
+import SNAKE_TAIL_UP from './assets/snake-tail-up.png';
+import SNAKE_TAIL_DOWN from './assets/snake-tail-down.png';
+import SNAKE_BODY_LEFT from './assets/snake-body-left.png';
+import SNAKE_BODY_RIGHT from './assets/snake-body-right.png';
+import SNAKE_BODY_UP from './assets/snake-body-up.png';
+import SNAKE_BODY_DOWN from './assets/snake-body-down.png';
+import RED_APPLE from './assets/red-apple.png';
 import './App.css';
 
 let CANVAS_WIDTH = window.innerWidth * 0.85;
@@ -14,12 +26,10 @@ const GAME_WIDTH = 20;
 const SQUARE_LENGTH = CANVAS_WIDTH / GAME_HEIGHT;
 
 const DEFAULT_SNAKE_LENGTH = 4;
-const START_X = 10;
+const START_X = 5;
 const START_Y = 11;
 
 const TOTAL_FRAMES_PER_SQUARE = 6;
-
-let snakeHead = null;
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -27,6 +37,36 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
+
+const RED_APPLE_IMAGE = new Image();
+RED_APPLE_IMAGE.src = RED_APPLE;
+
+const SNAKE_HEAD_IMAGE_LEFT = new Image();
+SNAKE_HEAD_IMAGE_LEFT.src = SNAKE_HEAD_LEFT;
+const SNAKE_HEAD_IMAGE_RIGHT = new Image();
+SNAKE_HEAD_IMAGE_RIGHT.src = SNAKE_HEAD_RIGHT;
+const SNAKE_HEAD_IMAGE_UP = new Image();
+SNAKE_HEAD_IMAGE_UP.src = SNAKE_HEAD_UP;
+const SNAKE_HEAD_IMAGE_DOWN = new Image();
+SNAKE_HEAD_IMAGE_DOWN.src = SNAKE_HEAD_DOWN;
+
+const SNAKE_TAIL_IMAGE_LEFT = new Image();
+SNAKE_TAIL_IMAGE_LEFT.src = SNAKE_TAIL_LEFT;
+const SNAKE_TAIL_IMAGE_RIGHT = new Image();
+SNAKE_TAIL_IMAGE_RIGHT.src = SNAKE_TAIL_RIGHT;
+const SNAKE_TAIL_IMAGE_UP = new Image();
+SNAKE_TAIL_IMAGE_UP.src = SNAKE_TAIL_UP;
+const SNAKE_TAIL_IMAGE_DOWN = new Image();
+SNAKE_TAIL_IMAGE_DOWN.src = SNAKE_TAIL_DOWN;
+
+const SNAKE_BODY_IMAGE_LEFT = new Image();
+SNAKE_BODY_IMAGE_LEFT.src = SNAKE_BODY_LEFT;
+const SNAKE_BODY_IMAGE_RIGHT = new Image();
+SNAKE_BODY_IMAGE_RIGHT.src = SNAKE_BODY_RIGHT;
+const SNAKE_BODY_IMAGE_UP = new Image();
+SNAKE_BODY_IMAGE_UP.src = SNAKE_BODY_UP;
+const SNAKE_BODY_IMAGE_DOWN = new Image();
+SNAKE_BODY_IMAGE_DOWN.src = SNAKE_BODY_DOWN;
 
 function generateToken(snake, tokenType) {
   const coordinates = [];
@@ -67,13 +107,12 @@ function generateToken(snake, tokenType) {
   }
 }
 
-function drawTokens(ctx, tokens, fillStyle) {
+function drawTokens(ctx, tokens, image) {
   for (let i = 0; i < tokens.length; i++) {
     const { x, y } = tokens[i];
     const xLocation = x * SQUARE_LENGTH;
     const yLocation = y * SQUARE_LENGTH;
-    ctx.fillStyle = fillStyle;
-    ctx.fillRect(xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+    ctx.drawImage(image, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
   }
 }
 
@@ -82,19 +121,18 @@ function drawHead(ctx, head, frameFraction) {
   const frameIncrement = frameFraction * SQUARE_LENGTH;
   const xLocation = x * SQUARE_LENGTH;
   const yLocation = y * SQUARE_LENGTH;
-  ctx.fillStyle = '#000000';
   switch(direction) {
     case DIRECTIONS.UP:
-      ctx.fillRect(xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(SNAKE_HEAD_IMAGE_UP, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
       break;
     case DIRECTIONS.DOWN:
-      ctx.fillRect(xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(SNAKE_HEAD_IMAGE_DOWN, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
       break;
     case DIRECTIONS.LEFT:
-      ctx.fillRect(xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(SNAKE_HEAD_IMAGE_LEFT, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
       break;
     case DIRECTIONS.RIGHT:
-      ctx.fillRect(xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(SNAKE_HEAD_IMAGE_RIGHT, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
       break;
     default:
       break;
@@ -107,22 +145,41 @@ function drawTail(ctx, tail, frameFraction) {
     const { x, y, direction } = tail[i];
     const xLocation = x * SQUARE_LENGTH;
     const yLocation = y * SQUARE_LENGTH;
-    ctx.fillStyle = '#000000';
-    switch(direction) {
-      case DIRECTIONS.UP:
-        ctx.fillRect(xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
-        break;
-      case DIRECTIONS.DOWN:
-        ctx.fillRect(xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
-        break;
-      case DIRECTIONS.LEFT:
-        ctx.fillRect(xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
-        break;
-      case DIRECTIONS.RIGHT:
-        ctx.fillRect(xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
-        break;
-      default:
-        break;
+    if (i === tail.length - 1) {
+      switch(direction) {
+        case DIRECTIONS.UP:
+          ctx.drawImage(SNAKE_TAIL_IMAGE_UP, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.DOWN:
+          ctx.drawImage(SNAKE_TAIL_IMAGE_DOWN, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.LEFT:
+          ctx.drawImage(SNAKE_TAIL_IMAGE_LEFT, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.RIGHT:
+          ctx.drawImage(SNAKE_TAIL_IMAGE_RIGHT, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        default:
+          break;
+      }
+    }
+    else {
+      switch(direction) {
+        case DIRECTIONS.UP:
+          ctx.drawImage(SNAKE_BODY_IMAGE_UP, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.DOWN:
+          ctx.drawImage(SNAKE_BODY_IMAGE_DOWN, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.LEFT:
+          ctx.drawImage(SNAKE_BODY_IMAGE_LEFT, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        case DIRECTIONS.RIGHT:
+          ctx.drawImage(SNAKE_BODY_IMAGE_RIGHT, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          break;
+        default:
+          break;
+      }
     }
   }
 }
@@ -186,8 +243,6 @@ function beginGameLoop(ctx, snake) {
     }
     if (frames === TOTAL_FRAMES_PER_SQUARE) {
       if (checkCollision(snake)) {
-        drawHead(ctx, snake.getHead(), frames / TOTAL_FRAMES_PER_SQUARE);
-        drawTail(ctx, snake.getTail(), frames / TOTAL_FRAMES_PER_SQUARE);
         return;
       }
       snake.move();
@@ -195,9 +250,9 @@ function beginGameLoop(ctx, snake) {
     }
     if (!checkCollision(snake)) {
       clearSnake(ctx);
-      drawTokens(ctx, evilTokens, '#FF0000');
-      drawTokens(ctx, neutralTokens, '#0000FF');
-      drawTokens(ctx, goodTokens, '#00FF00')
+      drawTokens(ctx, evilTokens, RED_APPLE_IMAGE);
+      //drawTokens(ctx, neutralTokens, '#0000FF');
+      //drawTokens(ctx, goodTokens, '#00FF00')
       drawHead(ctx, snake.getHead(), frames / TOTAL_FRAMES_PER_SQUARE);
       drawTail(ctx, snake.getTail(), frames / TOTAL_FRAMES_PER_SQUARE);
     }
@@ -250,25 +305,37 @@ function App() {
   useEffect(() => {
     const game = document.getElementById('game');
     const gameCtx = game.getContext('2d');
-    snakeHead = new Image();
-    snakeHead.onload = function() {
-      drawTail(gameCtx, snake.getTail(), 0);
-      drawHead(gameCtx, snake.getHead(), 0);
+
+    const { x, y } = game.getBoundingClientRect();
+
+    const background = document.getElementById('background');
+    background.style.left = x;
+    background.style.top = y;
+    const backgroundCtx = background.getContext('2d');
+
+    for (let i = 0; i < GAME_HEIGHT; i++) {
+      for (let j = 0; j < GAME_WIDTH; j++) {
+        if ((i + j) % 2 === 0) {
+          backgroundCtx.fillStyle = '#D9E121';
+        }
+        else {
+          backgroundCtx.fillStyle = '#FCEE23';
+        }
+        backgroundCtx.fillRect(j * SQUARE_LENGTH, i * SQUARE_LENGTH, SQUARE_LENGTH, SQUARE_LENGTH);
+      }
     }
-    snakeHead.src = SNAKE_HEAD_IMAGE;
     window.onkeydown = onKeyDownFactory(snake);
     beginGameLoop(gameCtx, snake);    
   });
 
+  
   return (
-    <div className="App">
-      <header className={'snakes-and-apples-header'}>
-        <title>Snakes and Apples</title>
-      </header>
+    <article className="App">
       <h1 className={'title'}>Snakes and Apples</h1>
       <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
-      <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-    </div>
+      <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+      <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}/>
+    </article>
   );
 }
 
