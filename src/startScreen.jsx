@@ -1,20 +1,26 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import './startScreen.css'
 
 import ARROW_KEYS_TUTORIAL from './assets/arrow-keys-tutorial.png';
 
-export default class StartScreen extends React.Component {
-    render() {
+function StartScreenComponent(props) {
         return (
-            <section className="start-screen" style={{ "width": this.props.width, "height": this.props.height, "marginTop": -this.props.height - 2 }}>
+            <section className="start-screen" style={{ "width": props.width, "height": props.height, "marginTop": -props.height - 2 }}>
                 <div class="vertical-center">
                     <img src={ARROW_KEYS_TUTORIAL} className="key-tutorial" alt=""></img>
                     <p><b>Arrow Keys to Move</b></p>
-                    <p> The more apples you eat, the longer you grow (or so it seems). </p>
-                    <p> Beware running into yourself or the walls for certain death will follow. </p>
-                    <button className="start-button" onClick={this.props.onPlayClicked}>Play!</button>
+                    <p>The more red apples you eat, the longer you will grow.</p>
+                    <p>Beware of running into yourself or walls. Certain death will follow.</p>
+                    <button className="start-button" onClick={props.onPlayClicked}>Play!</button>
                 </div>
             </section>
         );
-    }
 }
+
+StartScreenComponent.propTypes = {
+    onPlayClicked: PropTypes.func,
+    width: PropTypes.number,
+    height: PropTypes.number,
+};
+
+export default StartScreenComponent

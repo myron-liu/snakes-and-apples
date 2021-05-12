@@ -642,7 +642,8 @@ class App extends React.Component {
     super(props);
     this.state = { showingStartScreen: true };
     this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
-    this.gameCtx = undefined; // gets set in the componentDidMount() method
+    this.gameCtx = null; // gets set in the componentDidMount() method
+    this.startGame = this.startGame.bind(this);
   }
 
   componentDidMount() {
@@ -674,7 +675,7 @@ class App extends React.Component {
   }
 
   render() {
-     return (
+    return (
       <article className="App">
         <h1 className={'title'}>Snakes and Apples</h1>
         <section className={'subtitle'}>
@@ -682,8 +683,8 @@ class App extends React.Component {
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
         </section>
         <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-         <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-         {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame.bind(this)} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
+        <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+        {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
       </article>
     );
   }
