@@ -682,9 +682,11 @@ class App extends React.Component {
           <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
         </section>
-        <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-        <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-        {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
+        <div id={'game_container'}>
+          <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+          <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+          {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
+        </div>
       </article>
     );
   }
