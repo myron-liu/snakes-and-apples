@@ -21,13 +21,13 @@ export const GAME_WIDTH = 16;
 
 /** Enum representing score for type of token. */
 export const TOKEN_SCORE = {
-  [TOKEN_TYPE.RED_APPLE]: 1, 
+  [TOKEN_TYPE.RED_APPLE]: 1,
   [TOKEN_TYPE.RED_PIE]: 5,
-  [TOKEN_TYPE.GREEN_APPLE]: 10,  
+  [TOKEN_TYPE.GREEN_APPLE]: 10,
   [TOKEN_TYPE.GREEN_PIE]: 20,
   [TOKEN_TYPE.GREEN_SUBSIDY]: 50,
   [TOKEN_TYPE.CARBON_TAX]: 150,
-  [TOKEN_TYPE.CARBON_DIVIDEND]: 200, 
+  [TOKEN_TYPE.CARBON_DIVIDEND]: 200,
 };
 
 export const TOKEN_CONCENTRATION = {
@@ -37,7 +37,7 @@ export const TOKEN_CONCENTRATION = {
   [TOKEN_TYPE.GREEN_PIE]: -2,
   [TOKEN_TYPE.GREEN_SUBSIDY]: -4,
   [TOKEN_TYPE.CARBON_TAX]: -5,
-  [TOKEN_TYPE.CARBON_DIVIDEND]: -10, 
+  [TOKEN_TYPE.CARBON_DIVIDEND]: -10,
 }
 
 /** Enum representing directions. */
@@ -47,9 +47,9 @@ export const SNAKE_STATES = {ALIVE: 'ALIVE', DEAD: 'DEAD', INVINCIBLE: 'INVINCIB
 
 /** Enum representing opposite directions. */
 export const OPPOSITE_DIRECTIONS = {
-  [DIRECTIONS.UP] : DIRECTIONS.DOWN, 
-  [DIRECTIONS.DOWN] : DIRECTIONS.UP, 
-  [DIRECTIONS.LEFT] : DIRECTIONS.RIGHT, 
+  [DIRECTIONS.UP]: DIRECTIONS.DOWN,
+  [DIRECTIONS.DOWN]: DIRECTIONS.UP,
+  [DIRECTIONS.LEFT]: DIRECTIONS.RIGHT,
   [DIRECTIONS.RIGHT] : DIRECTIONS.LEFT
 };
 
@@ -61,16 +61,16 @@ function shuffleArray(array) {
 }
 
 /**
- * Snake class that holds the logic for the snake. 
- * Represented as a linked list of coordinates. 
- * We can use an array to represent the linked list. 
+ * Snake class that holds the logic for the snake.
+ * Represented as a linked list of coordinates.
+ * We can use an array to represent the linked list.
  * The head is the start of the array.
- * 
+ *
  * Snake begins horizontally from (startX, startY) with initial length.
- * 
+ *
  * (x, y) on the grid starts in the top left as (0, 0).
  * Downwards y increases positively. Rightwards x increases positively.
- * 
+ *
  * This also holds logic of the game grid including the tokens.
  */
 export class Snake {
@@ -210,7 +210,15 @@ export class Snake {
   addHazard(x, y, hazardType) {
     this.hazards.push({x, y, hazardType});
   }
-  
+
+  clearTokens() {
+    this.tokens = [];
+  }
+
+  clearHazards() {
+    this.hazards = [];
+  }
+
   /** Changes direction according the direction passed in. */
   changeDirection(direction) {
     this.getHead().direction = direction;
@@ -342,7 +350,7 @@ export class Snake {
       this.addHazard(x, y, HAZARD_TYPE.DROUGHT);
     }
   }
-  
+
   generateToken() {
     const coordinates = this.generateFreeCoordinates();
 
@@ -441,7 +449,7 @@ export class Snake {
       this.addToken(x, y, TOKEN_TYPE.GREEN_PIE);
       greenPieCounter += 1;
     }
-    
+
     // GREEN SUBSIDY rules
     const greenSubsidyExists = this.getNumTokensOfType(TOKEN_TYPE.GREEN_SUBSIDY) >= 1;
     if (this.concentration > 380 && this.moveNumber > this.lastGreenSubsidy + 250 && coordinates.length > 0 && !greenSubsidyExists) {
@@ -449,7 +457,7 @@ export class Snake {
       this.addToken(x, y, TOKEN_TYPE.GREEN_SUBSIDY);
       this.lastGreenSubsidy = this.moveNumber;
     }
-    
+
     // CARBON TAX rules
     const carbonTaxExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_TAX) >= 1;
     if (this.concentration > 350 && this.moveNumber > this.lastCarbonTax + 200 && coordinates.length > 0 && !carbonTaxExists) {
@@ -457,7 +465,7 @@ export class Snake {
       this.addToken(x, y, TOKEN_TYPE.CARBON_TAX);
       this.lastCarbonTax = this.moveNumber;
     }
-    
+
     // CARBON DIVIDEND rules
     const carbonDividendExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_DIVIDEND) >= 1;
     if (this.concentration > 360 && this.moveNumber > this.lastCarbonDividend + 500 && coordinates.length > 0 && !carbonDividendExists) {
@@ -473,7 +481,7 @@ export class Snake {
     const head = this.getHead();
     const direction = this.getDirection();
     const { x, y } = head;
-    
+
     this.moveNumber += 1;
     this.invincibleModeNumber += 1;
     this.eating = false;
@@ -519,7 +527,7 @@ export class Snake {
         else {
           this.snake.unshift({ x: x - 1, y, direction });
         }
-        break; 
+        break;
       case DIRECTIONS.RIGHT:
         if (isInvincible && x + 1 === GAME_WIDTH) {
           this.snake.unshift({ x: 0, y, direction});
@@ -558,7 +566,7 @@ export class Snake {
         else {
           shouldEat = this.hasToken(this.tokens, newHead.x - 1, newHead.y);
         }
-        break; 
+        break;
       case DIRECTIONS.RIGHT:
         if (isInvincible && x + 1 === GAME_HEIGHT) {
           shouldEat = this.hasToken(this.tokens, 0, newHead.y);
@@ -574,7 +582,7 @@ export class Snake {
     if (shouldEat) {
       this.eating = true;
     }
-    
+
     const tokenType = this.consumeToken(newHead.x, newHead.y);
     switch(tokenType) {
       case TOKEN_TYPE.RED_APPLE:

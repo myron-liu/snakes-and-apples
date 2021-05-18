@@ -1,6 +1,7 @@
 import React from 'react';
 
 import StartScreen from './startScreen'
+import GameOverScreen from './gameOverScreen'
 import { Snake, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
 import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
 import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
@@ -60,13 +61,12 @@ import FLOOD from './assets/flood.png';
 
 import './App.css';
 
-let CANVAS_WIDTH = window.innerWidth * 0.80;
-let CANVAS_HEIGHT = window.innerHeight * 0.80;
-CANVAS_WIDTH = Math.min(CANVAS_WIDTH, CANVAS_HEIGHT);
-CANVAS_HEIGHT = CANVAS_WIDTH;
+let canvasWidth = window.innerWidth * 0.80;
+let canvasHeight = window.innerHeight * 0.80;
+canvasWidth = Math.min(canvasWidth, canvasHeight);
+canvasHeight = canvasWidth;
 
-
-const SQUARE_LENGTH = CANVAS_WIDTH / GAME_HEIGHT;
+let squareLength = canvasWidth / GAME_HEIGHT;
 
 const DEFAULT_SNAKE_LENGTH = 8;
 const START_X = 9;
@@ -292,9 +292,9 @@ function drawTokens(ctx, tokens) {
   for (let i = 0; i < tokens.length; i++) {
     const { x, y, tokenType } = tokens[i];
     const image = TOKEN_IMAGES[tokenType];
-    const xLocation = x * SQUARE_LENGTH;
-    const yLocation = y * SQUARE_LENGTH;
-    ctx.drawImage(image, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+    const xLocation = x * squareLength;
+    const yLocation = y * squareLength;
+    ctx.drawImage(image, xLocation, yLocation, squareLength, squareLength);
   }
 }
 
@@ -302,9 +302,9 @@ function drawHazards(ctx, hazards) {
   for (let i = 0; i < hazards.length; i++) {
     const { x, y, hazardType } = hazards[i];
     const image = HAZARD_IMAGES[hazardType];
-    const xLocation = x * SQUARE_LENGTH;
-    const yLocation = y * SQUARE_LENGTH;
-    ctx.drawImage(image, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+    const xLocation = x * squareLength;
+    const yLocation = y * squareLength;
+    ctx.drawImage(image, xLocation, yLocation, squareLength, squareLength);
   }
 }
 
@@ -312,23 +312,23 @@ function drawHead(ctx, snake, frameFraction) {
   const head = snake.getHead();
   const snakeState = snake.getState();
   const { x, y, direction } = head;
-  const frameIncrement = frameFraction * SQUARE_LENGTH;
-  const xLocation = x * SQUARE_LENGTH;
-  const yLocation = y * SQUARE_LENGTH;
+  const frameIncrement = frameFraction * squareLength;
+  const xLocation = x * squareLength;
+  const yLocation = y * squareLength;
 
   const snakeHead = !snake.isEating() || snakeState === "DEAD" ? SNAKE_HEADS[snakeState][direction] : SNAKE_HEADS_EATING[snakeState][direction];
   switch (direction) {
     case DIRECTIONS.UP:
-      ctx.drawImage(snakeHead, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(snakeHead, xLocation, yLocation - frameIncrement, squareLength, squareLength);
       break;
     case DIRECTIONS.DOWN:
-      ctx.drawImage(snakeHead, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(snakeHead, xLocation, yLocation + frameIncrement, squareLength, squareLength);
       break;
     case DIRECTIONS.LEFT:
-      ctx.drawImage(snakeHead, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(snakeHead, xLocation - frameIncrement, yLocation, squareLength, squareLength);
       break;
     case DIRECTIONS.RIGHT:
-      ctx.drawImage(snakeHead, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+      ctx.drawImage(snakeHead, xLocation + frameIncrement, yLocation, squareLength, squareLength);
       break;
     default:
       break;
@@ -336,12 +336,12 @@ function drawHead(ctx, snake, frameFraction) {
 }
 
 function drawTail(ctx, snake, frameFraction) {
-  const frameIncrement = frameFraction * SQUARE_LENGTH;
+  const frameIncrement = frameFraction * squareLength;
   const tail = snake.getTail();
   for (let i = 0; i < tail.length; i++) {
     let { x, y, direction } = tail[i];
-    const xLocation = x * SQUARE_LENGTH;
-    const yLocation = y * SQUARE_LENGTH;
+    const xLocation = x * squareLength;
+    const yLocation = y * squareLength;
     if (i === tail.length - 1) {
       const snakeState = snake.getState();
       let snakeTail = SNAKE_TAILS[snakeState][direction];
@@ -355,16 +355,16 @@ function drawTail(ctx, snake, frameFraction) {
       }
       switch (direction) {
         case DIRECTIONS.UP:
-          ctx.drawImage(snakeTail, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeTail, xLocation, yLocation - frameIncrement, squareLength, squareLength);
           break;
         case DIRECTIONS.DOWN:
-          ctx.drawImage(snakeTail, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeTail, xLocation, yLocation + frameIncrement, squareLength, squareLength);
           break;
         case DIRECTIONS.LEFT:
-          ctx.drawImage(snakeTail, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeTail, xLocation - frameIncrement, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.RIGHT:
-          ctx.drawImage(snakeTail, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeTail, xLocation + frameIncrement, yLocation, squareLength, squareLength);
           break;
         default:
           break;
@@ -383,16 +383,16 @@ function drawTail(ctx, snake, frameFraction) {
       }
       switch (direction) {
         case DIRECTIONS.UP:
-          ctx.drawImage(snakeBody, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeBody, xLocation, yLocation - frameIncrement, squareLength, squareLength);
           break;
         case DIRECTIONS.DOWN:
-          ctx.drawImage(snakeBody, xLocation, yLocation + frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeBody, xLocation, yLocation + frameIncrement, squareLength, squareLength);
           break;
         case DIRECTIONS.LEFT:
-          ctx.drawImage(snakeBody, xLocation - frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeBody, xLocation - frameIncrement, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.RIGHT:
-          ctx.drawImage(snakeBody, xLocation + frameIncrement, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(snakeBody, xLocation + frameIncrement, yLocation, squareLength, squareLength);
           break;
         default:
           break;
@@ -406,8 +406,8 @@ function drawProperTail(ctx, tail, head) {
   let prevY = head.y;
   for (let i = 0; i < tail.length; i++) {
     let { x, y, direction } = tail[i];
-    const xLocation = x * SQUARE_LENGTH;
-    const yLocation = y * SQUARE_LENGTH;
+    const xLocation = x * squareLength;
+    const yLocation = y * squareLength;
     if (x !== prevX) {
       direction = getXDirection(x, prevX);
     }
@@ -417,16 +417,16 @@ function drawProperTail(ctx, tail, head) {
     if (i === tail.length - 1) {
       switch (direction) {
         case DIRECTIONS.UP:
-          ctx.drawImage(SNAKE_TAIL_IMAGE_UP, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_TAIL_IMAGE_UP, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.DOWN:
-          ctx.drawImage(SNAKE_TAIL_IMAGE_DOWN, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_TAIL_IMAGE_DOWN, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.LEFT:
-          ctx.drawImage(SNAKE_TAIL_IMAGE_LEFT, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_TAIL_IMAGE_LEFT, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.RIGHT:
-          ctx.drawImage(SNAKE_TAIL_IMAGE_RIGHT, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_TAIL_IMAGE_RIGHT, xLocation, yLocation, squareLength, squareLength);
           break;
         default:
           break;
@@ -440,21 +440,21 @@ function drawProperTail(ctx, tail, head) {
       prevX = x;
       prevY = y;
       if (snakeTurn) {
-        ctx.drawImage(SNAKE_TURNS[turn], xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+        ctx.drawImage(SNAKE_TURNS[turn], xLocation, yLocation, squareLength, squareLength);
         continue;
       }
       switch (direction) {
         case DIRECTIONS.UP:
-          ctx.drawImage(SNAKE_BODY_IMAGE_UP, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_BODY_IMAGE_UP, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.DOWN:
-          ctx.drawImage(SNAKE_BODY_IMAGE_DOWN, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_BODY_IMAGE_DOWN, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.LEFT:
-          ctx.drawImage(SNAKE_BODY_IMAGE_LEFT, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_BODY_IMAGE_LEFT, xLocation, yLocation, squareLength, squareLength);
           break;
         case DIRECTIONS.RIGHT:
-          ctx.drawImage(SNAKE_BODY_IMAGE_RIGHT, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
+          ctx.drawImage(SNAKE_BODY_IMAGE_RIGHT, xLocation, yLocation, squareLength, squareLength);
           break;
         default:
           break;
@@ -500,7 +500,7 @@ function getYDirection(y, prevY) {
 
 
 function clearSnake(ctx) {
-  ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 }
 
 function checkCollision(snake) {
@@ -543,45 +543,6 @@ function checkCollision(snake) {
       break;
   }
   return snake.contains(newX, newY) || snake.containsHazard(newX, newY);
-}
-
-
-function beginGameLoop(ctx, snake) {
-  let frames = 0;
-  function gameLoopCallback() {
-    if (frames === TOTAL_FRAMES_PER_SQUARE) {
-      if (checkCollision(snake)) {
-        clearSnake(ctx);
-        window.onkeydown = null;
-        snake.setStateToDead();
-        drawTokens(ctx, snake.getTokens());
-        drawHazards(ctx, snake.getHazards());
-        drawHead(ctx, snake, 0);
-        drawProperTail(ctx, snake.getTail(), snake.getHead());
-        return;
-      }
-      snake.move();
-      const background = document.getElementById('background');
-      const backgroundCtx = background.getContext('2d');
-      if (snake.getCarbonTaxed()) {
-        drawBackground(backgroundCtx, '#C6FD77', '#B1EC77');
-      }
-      else {
-        drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
-      }
-      frames = 0;
-    }
-    if (!checkCollision(snake)) {
-      clearSnake(ctx);
-      drawTokens(ctx, snake.getTokens());
-      drawHazards(ctx, snake.getHazards());
-      drawHead(ctx, snake, frames / TOTAL_FRAMES_PER_SQUARE);
-      drawTail(ctx, snake, frames / TOTAL_FRAMES_PER_SQUARE);
-    }
-    frames += 1;
-    window.requestAnimationFrame(gameLoopCallback);
-  }
-  window.requestAnimationFrame(gameLoopCallback);
 }
 
 function onKeyDownFactory(snake) {
@@ -630,62 +591,162 @@ function drawBackground(backgroundCtx, firstColor, secondColor) {
       else {
         backgroundCtx.fillStyle = secondColor;
       }
-      backgroundCtx.fillRect(j * SQUARE_LENGTH, i * SQUARE_LENGTH, SQUARE_LENGTH, SQUARE_LENGTH);
+      backgroundCtx.fillRect(j * squareLength, i * squareLength, squareLength, squareLength);
     }
   }
 }
 
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { showingStartScreen: true };
+    this.state = {
+      showingStartScreen: true,
+      showingGameOverScreen: false,
+      countDownDigit: 0,
+    };
     this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
     this.gameCtx = null; // gets set in the componentDidMount() method
-    this.startGame = this.startGame.bind(this);
   }
 
   componentDidMount() {
     const game = document.getElementById('game');
     this.gameCtx = game.getContext('2d');
 
-    const { x, y } = game.getBoundingClientRect();
+    window.onresize = () => { this.onWindowResize() }
+    this.onWindowResize();
+  }
 
+  onWindowResize() {
+    canvasWidth = canvasHeight = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.80);
+    squareLength = canvasHeight / GAME_HEIGHT;
+
+    const game = document.getElementById('game');
     const background = document.getElementById('background');
-    background.style.left = x;
-    background.style.top = y;
+    const gameContainer = document.getElementById('game_container');
+    game.width = background.width = canvasWidth;
+    game.height = background.height = canvasHeight;
+    gameContainer.style.width = canvasWidth + "px";
+    gameContainer.style.height = canvasHeight + "px"
 
-    const scoreContainer = document.querySelector('.score-container');
-    const concentrationContainer = document.querySelector('.concentration-container');
+    const scoreContainer = document.getElementById('game_subtitle');
+    scoreContainer.style.width = `${canvasWidth}px`;
 
-    scoreContainer.style.marginLeft = `${x}px`;
-    concentrationContainer.style.marginRight = `${window.innerWidth - x - CANVAS_WIDTH}px`
+    this.drawBackground();
+    if (this.state.showingStartScreen === false) this.drawSnakeAndItems(0);
+  }
 
+  /**
+   * Draws the background checkerboard to the background canvas with a color scheme based on the game state.
+   */
+  drawBackground() {
+    const background = document.getElementById('background');
     const backgroundCtx = background.getContext('2d');
-    drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
+    if (this.snake.getCarbonTaxed()) {
+      drawBackground(backgroundCtx, '#C6FD77', '#B1EC77');
+    }
+    else {
+      drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
+    }
+  }
 
-    window.onkeydown = onKeyDownFactory(this.snake);
+  /**
+   * Draws the snake and items (hazards + tokens)
+   * @param frameNum - the frame number of snake movement within the current square, pass 0 if the snake is still to draw the proper tail.
+   */
+  drawSnakeAndItems(frameNum) {
+    clearSnake(this.gameCtx);
+    drawTokens(this.gameCtx, this.snake.getTokens());
+    drawHazards(this.gameCtx, this.snake.getHazards());
+    drawHead(this.gameCtx, this.snake, frameNum);
+    if (frameNum === 0)
+      drawProperTail(this.gameCtx, this.snake.getTail(), this.snake.getHead());
+    else
+      drawTail(this.gameCtx, this.snake, frameNum)
+  }
+
+  resetGameBoard() {
     this.snake.generateToken();
+    this.drawBackground();
+    this.drawSnakeAndItems(0);
   }
 
   startGame() {
-    beginGameLoop(this.gameCtx, this.snake);
-    this.setState({ showingStartScreen: false })
+    window.onkeydown = onKeyDownFactory(this.snake);
+    this.beginGameLoop();
+    this.setState({ showingStartScreen: false, showingGameOverScreen: false })
+  }
+
+  startCountdown() {
+    this.setState({
+      countDownDigit: 3,
+      showingStartScreen: false,
+      showingGameOverScreen: false
+    })
+
+    let intervalId = setInterval(() => {
+      if (this.state.countDownDigit > 0) {
+        this.setState({ countDownDigit: this.state.countDownDigit - 1 })
+      }
+      if (this.state.countDownDigit === 0) {
+        clearInterval(intervalId)
+        this.startGame();
+      }
+    }, 700)
+
+    // for whatever reason it seems to need a timeout before rendering the new game board, otherwise everything is white.
+    setTimeout(() => {
+      this.resetGameBoard();
+    }, 3)
+  }
+
+  gameOver() {
+    this.snake.setStateToDead();
+    this.drawSnakeAndItems(0)
+    this.setState({ showingGameOverScreen: true })
+    window.onkeydown = null;
+    window.onkeydown = () => {
+      window.onkeydown = null;
+      this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
+      this.resetGameBoard()
+      this.startCountdown()
+    };
+  }
+
+  beginGameLoop() {
+    let frames = 0;
+    let gameLoopCallback = () => {
+      if (frames === TOTAL_FRAMES_PER_SQUARE) {
+        if (checkCollision(this.snake)) {
+          this.gameOver();
+          return;
+        }
+        this.snake.move();
+        this.drawBackground();
+        frames = 0;
+      }
+      if (!checkCollision(this.snake)) {
+        this.drawSnakeAndItems(frames / TOTAL_FRAMES_PER_SQUARE);
+      }
+      frames += 1;
+      window.requestAnimationFrame(gameLoopCallback);
+    }
+    window.requestAnimationFrame(gameLoopCallback);
   }
 
   render() {
     return (
       <article className="App">
         <h1 className={'title'}>Snakes and Apples</h1>
-        <section className={'subtitle'}>
+        <section className={'subtitle'} id={'game_subtitle'}>
           <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
         </section>
         <div id={'game_container'}>
-          <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-          <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-          {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
+          <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
+          <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
+          {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
+          {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
+          {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
         </div>
       </article>
     );
