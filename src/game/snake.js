@@ -1,3 +1,40 @@
+import { Howl } from "howler"
+
+import RED_APPLE_CRUNCH_SOUND from '../assets/sounds/red_apple_crunch_sound.mp3';
+import RED_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
+import GREEN_APPLE_CRUCH_SOUND from '../assets/sounds/green_apple_crunch_sound.mp3';
+import GREEN_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
+import GREEN_SUBSIDY_SOUND from '../assets/sounds/green_subsidy_sound.wav';
+// import GREEN_SUBSIDY_BACKGROUND_SOUND from './assets/sounds/green_subsidy_background_sound.mp3';
+import CARBON_TAX_SOUND from '../assets/sounds/carbon_tax_sound.wav';
+// import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
+import CARBON_DIVIDEND_SOUND from '../assets/sounds/carbon_dividend_sound.mp3';
+
+
+let AUDIO_CLIPS = {
+  'RED_APPLE_CRUNCH_SOUND': new Howl({
+    src: [RED_APPLE_CRUNCH_SOUND],
+  }),
+  'RED_PIE_SOUND': new Howl({
+    src: [RED_PIE_SOUND],
+  }),
+  'GREEN_APPLE_CRUNCH_SOUND': new Howl({
+    src: [GREEN_APPLE_CRUCH_SOUND],
+  }),
+  'GREEN_PIE_SOUND': new Howl({
+    src: [GREEN_PIE_SOUND],
+  }),
+  'CARBON_TAX_SOUND': new Howl({
+    src: [CARBON_TAX_SOUND],
+  }),
+  'CARBON_DIVIDEND_SOUND': new Howl({
+    src: [CARBON_DIVIDEND_SOUND],
+  }),
+  'GREEN_SUBSIDY_SOUND': new Howl({
+    src: [GREEN_SUBSIDY_SOUND],
+  }),
+}
+
 /** Enum repsenting the token type. */
 export const TOKEN_TYPE = {
   'RED_APPLE': 1,
@@ -10,7 +47,7 @@ export const TOKEN_TYPE = {
 };
 
 export const HAZARD_TYPE = {
-  'DROUGHT' : 8,
+  'DROUGHT': 8,
   'FIRE': 9,
   'FLOOD': 10,
 };
@@ -41,17 +78,19 @@ export const TOKEN_CONCENTRATION = {
 }
 
 /** Enum representing directions. */
-export const DIRECTIONS = {'UP': 1, 'DOWN': 2, 'LEFT': 3, 'RIGHT': 4};
+export const DIRECTIONS = { 'UP': 1, 'DOWN': 2, 'LEFT': 3, 'RIGHT': 4 };
 
-export const SNAKE_STATES = {ALIVE: 'ALIVE', DEAD: 'DEAD', INVINCIBLE: 'INVINCIBLE'};
+export const SNAKE_STATES = { ALIVE: 'ALIVE', DEAD: 'DEAD', INVINCIBLE: 'INVINCIBLE' };
 
 /** Enum representing opposite directions. */
 export const OPPOSITE_DIRECTIONS = {
   [DIRECTIONS.UP]: DIRECTIONS.DOWN,
   [DIRECTIONS.DOWN]: DIRECTIONS.UP,
   [DIRECTIONS.LEFT]: DIRECTIONS.RIGHT,
-  [DIRECTIONS.RIGHT] : DIRECTIONS.LEFT
+  [DIRECTIONS.RIGHT]: DIRECTIONS.LEFT
 };
+
+
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -59,6 +98,7 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
+
 
 /**
  * Snake class that holds the logic for the snake.
@@ -204,11 +244,11 @@ export class Snake {
   }
 
   addToken(x, y, tokenType) {
-    this.tokens.push({x, y, tokenType});
+    this.tokens.push({ x, y, tokenType });
   };
 
   addHazard(x, y, hazardType) {
-    this.hazards.push({x, y, hazardType});
+    this.hazards.push({ x, y, hazardType });
   }
 
   clearTokens() {
@@ -280,7 +320,7 @@ export class Snake {
     });
     for (let i = 0; i < GAME_WIDTH; i++) {
       for (let j = 0; j < GAME_HEIGHT; j++) {
-        const coordinate = { x : i, y: j };
+        const coordinate = { x: i, y: j };
         if (this.hasToken(this.hazards, coordinate.x, coordinate.y)) {
           continue;
         }
@@ -373,7 +413,7 @@ export class Snake {
     }
     let redAppleCounter = 0;
     let currentNumRedApples = this.getNumTokensOfType(TOKEN_TYPE.RED_APPLE);
-    let totalRedApplesToSpawn = currentNumRedApples < maxRedApples ? Math.random()  * (maxRedApples - Math.max(currentNumRedApples, 1)) + 1 : 0;
+    let totalRedApplesToSpawn = currentNumRedApples < maxRedApples ? Math.random() * (maxRedApples - Math.max(currentNumRedApples, 1)) + 1 : 0;
     let numRedApples = this.getNumTokensOfType(TOKEN_TYPE.RED_APPLE);
     while (coordinates.length > 0 && redAppleCounter < totalRedApplesToSpawn && numRedApples <= maxRedApples) {
       const { x, y } = coordinates.pop();
@@ -503,10 +543,10 @@ export class Snake {
     if (this.carbonTaxed) {
       this.carbonTaxCount += 1;
     }
-    switch(direction) {
+    switch (direction) {
       case DIRECTIONS.UP:
         if (isInvincible && y - 1 === -1) {
-          this.snake.unshift({ x, y: GAME_HEIGHT - 1, direction});
+          this.snake.unshift({ x, y: GAME_HEIGHT - 1, direction });
         }
         else {
           this.snake.unshift({ x, y: y - 1, direction });
@@ -514,7 +554,7 @@ export class Snake {
         break;
       case DIRECTIONS.DOWN:
         if (isInvincible && y + 1 === GAME_HEIGHT) {
-          this.snake.unshift({ x, y: 0, direction});
+          this.snake.unshift({ x, y: 0, direction });
         }
         else {
           this.snake.unshift({ x, y: y + 1, direction });
@@ -522,7 +562,7 @@ export class Snake {
         break;
       case DIRECTIONS.LEFT:
         if (isInvincible && x - 1 === -1) {
-          this.snake.unshift({ x: GAME_WIDTH - 1, y, direction});
+          this.snake.unshift({ x: GAME_WIDTH - 1, y, direction });
         }
         else {
           this.snake.unshift({ x: x - 1, y, direction });
@@ -530,7 +570,7 @@ export class Snake {
         break;
       case DIRECTIONS.RIGHT:
         if (isInvincible && x + 1 === GAME_WIDTH) {
-          this.snake.unshift({ x: 0, y, direction});
+          this.snake.unshift({ x: 0, y, direction });
         }
         else {
           this.snake.unshift({ x: x + 1, y, direction });
@@ -542,7 +582,7 @@ export class Snake {
     const newHead = this.getHead();
     let shouldEatNow = this.hasToken(this.tokens, newHead.x, newHead.y);
     let shouldEat = false;
-    switch(newHead.direction) {
+    switch (newHead.direction) {
       case DIRECTIONS.UP:
         if (isInvincible && y - 1 === -1) {
           shouldEat = this.hasToken(this.tokens, newHead.x, GAME_HEIGHT - 1);
@@ -584,16 +624,27 @@ export class Snake {
     }
 
     const tokenType = this.consumeToken(newHead.x, newHead.y);
-    switch(tokenType) {
+    switch (tokenType) {
       case TOKEN_TYPE.RED_APPLE:
-      case TOKEN_TYPE.RED_PIE:
+        // play crunch sound:
+        AUDIO_CLIPS['RED_APPLE_CRUNCH_SOUND'].play();
         this.generateToken();
-      break;
+        break;
+      case TOKEN_TYPE.RED_PIE:
+        // play crunch sound:
+        AUDIO_CLIPS['RED_PIE_SOUND'].play();
+        this.generateToken();
+        break;
       case TOKEN_TYPE.GREEN_APPLE:
+        // play crunch sound:
+        AUDIO_CLIPS['GREEN_APPLE_CRUNCH_SOUND'].play();
+        this.generateToken();
+        break;
       case TOKEN_TYPE.GREEN_PIE:
         this.snake.pop();
         this.generateToken();
-      break;
+        AUDIO_CLIPS['GREEN_PIE_SOUND'].play();
+        break;
       case TOKEN_TYPE.GREEN_SUBSIDY:
         const poppingLevel = Math.floor(0.4 * this.snake.length);
         let counter = 0;
@@ -602,6 +653,7 @@ export class Snake {
           counter += 1;
         }
         this.generateToken(false);
+        AUDIO_CLIPS['GREEN_SUBSIDY_SOUND'].play();
         break;
       case TOKEN_TYPE.CARBON_TAX:
         this.snake.pop();
@@ -618,13 +670,15 @@ export class Snake {
         this.carbonTaxed = true;
         this.carbonTaxCount = 0;
         this.generateToken();
-      break;
+        AUDIO_CLIPS['CARBON_TAX_SOUND'].play();
+        break;
       case TOKEN_TYPE.CARBON_DIVIDEND:
         this.snake.pop();
         this.generateToken(false);
         this.invincibleModeNumber = 0;
         this.setStateToInvincible();
         this.fading = false;
+        AUDIO_CLIPS['CARBON_DIVIDEND_SOUND'].play();
         break;
       default:
         this.snake.pop();

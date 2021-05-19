@@ -1,8 +1,12 @@
 import React from 'react';
+import { Howl } from "howler"
+
+import './App.css';
 
 import StartScreen from './startScreen'
 import GameOverScreen from './gameOverScreen'
-import { Snake, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
+import { Snake, SNAKE_STATES, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
+
 import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
 import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
 import SNAKE_HEAD_UP from './assets/snake-head-up.png';
@@ -59,7 +63,33 @@ import DROUGHT from './assets/drought.png';
 import FIRE from './assets/fire.png';
 import FLOOD from './assets/flood.png';
 
-import './App.css';
+import SOUNDTRACK from './assets/sounds/soundtrack.wav';
+import GREEN_SUBSIDY_BACKGROUND_SOUND from './assets/sounds/green_subsidy_background_sound.wav';
+import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
+
+import SNAKE_BUMP_SOUND from './assets/sounds/snake_bump_sound.wav';
+import WALL_BUMP_SOUND from './assets/sounds/wall_bump_sound.wav';
+
+let AUDIO_CLIPS = {
+  'SOUNDTRACK': new Howl({
+    src: [SOUNDTRACK],
+    loop: true,
+  }),
+  'CARBON_TAX_BACKGROUND_SOUND': new Howl({
+    src: [CARBON_TAX_BACKGROUND_SOUND],
+    loop: true,
+  }),
+  'GREEN_SUBSIDY_BACKGROUND_SOUND': new Howl({
+    src: [GREEN_SUBSIDY_BACKGROUND_SOUND],
+    loop: true,
+  }),
+  'SNAKE_BUMP_SOUND': new Howl({
+    src: [SNAKE_BUMP_SOUND],
+  }),
+  'WALL_BUMP_SOUND': new Howl({
+    src: [WALL_BUMP_SOUND],
+  })
+}
 
 let canvasWidth = window.innerWidth * 0.80;
 let canvasHeight = window.innerHeight * 0.80;
@@ -509,15 +539,19 @@ function checkCollision(snake) {
     return false;
   }
   if (x === GAME_WIDTH - 1 && direction === DIRECTIONS.RIGHT) {
+    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
     return true;
   }
   if (x === 0 && direction === DIRECTIONS.LEFT) {
+    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
     return true;
   }
   if (y === GAME_HEIGHT - 1 && direction === DIRECTIONS.DOWN) {
+    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
     return true;
   }
   if (y === 0 && direction === DIRECTIONS.UP) {
+    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
     return true;
   }
   let newX = -1;
@@ -542,7 +576,13 @@ function checkCollision(snake) {
     default:
       break;
   }
-  return snake.contains(newX, newY) || snake.containsHazard(newX, newY);
+  if (snake.contains(newX, newY)) {
+    AUDIO_CLIPS['SNAKE_BUMP_SOUND'].play();
+    return true;
+  } else if (snake.containsHazard(newX, newY)) {
+    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
+    return true;
+  }
 }
 
 function onKeyDownFactory(snake) {
@@ -665,6 +705,15 @@ class App extends React.Component {
   }
 
   resetGameBoard() {
+    for (let clip in AUDIO_CLIPS) {
+      if (clip === "SOUNDTRACK" && !AUDIO_CLIPS['SOUNDTRACK'].playing()) {
+        // keep the soundtrack playing, or start it if it isn't playing:
+        AUDIO_CLIPS['SOUNDTRACK'].play();
+      } else {
+        // stop all the other sounds:
+        AUDIO_CLIPS[clip].stop()
+      }
+    }
     this.snake.generateToken();
     this.drawBackground();
     this.drawSnakeAndItems(0);
@@ -712,6 +761,29 @@ class App extends React.Component {
     };
   }
 
+  handleBackgroundSounds() {
+    if (this.snake.getCarbonTaxed() && (!AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing())) {
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].play();
+      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, 1000);
+      AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].stop()
+    }
+    else if (!this.snake.getCarbonTaxed() && AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()) {
+      const fadeTime = 1000 // ms
+      AUDIO_CLIPS['SOUNDTRACK'].fade(0.4, 1, fadeTime);
+      setTimeout(() => { AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop() }, fadeTime)
+    }
+    if (this.snake.getState() === SNAKE_STATES.INVINCIBLE && (!AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing())) {
+      AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].play();
+      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, 1000);
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
+    }
+    else if (this.snake.getState() !== SNAKE_STATES.INVINCIBLE && AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing()) {
+      const fadeTime = 1000 // ms
+      AUDIO_CLIPS['SOUNDTRACK'].fade(0, 1, fadeTime);
+      setTimeout(() => { AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].stop() }, fadeTime)
+    }
+  }
+
   beginGameLoop() {
     let frames = 0;
     let gameLoopCallback = () => {
@@ -726,6 +798,7 @@ class App extends React.Component {
       }
       if (!checkCollision(this.snake)) {
         this.drawSnakeAndItems(frames / TOTAL_FRAMES_PER_SQUARE);
+        this.handleBackgroundSounds()
       }
       frames += 1;
       window.requestAnimationFrame(gameLoopCallback);
