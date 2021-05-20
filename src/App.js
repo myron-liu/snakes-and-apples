@@ -64,7 +64,7 @@ import FIRE from './assets/fire.png';
 import FLOOD from './assets/flood.png';
 
 import SOUNDTRACK from './assets/sounds/soundtrack.wav';
-import GREEN_SUBSIDY_BACKGROUND_SOUND from './assets/sounds/green_subsidy_background_sound.wav';
+import CARBON_DIVIDEND_BACKGROUND_SOUND from './assets/sounds/carbon_dividend_background_sound.wav';
 import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
 
 import SNAKE_BUMP_SOUND from './assets/sounds/snake_bump_sound.wav';
@@ -80,8 +80,8 @@ let AUDIO_CLIPS = {
     src: [CARBON_TAX_BACKGROUND_SOUND],
     loop: true,
   }),
-  'GREEN_SUBSIDY_BACKGROUND_SOUND': new Howl({
-    src: [GREEN_SUBSIDY_BACKGROUND_SOUND],
+  'CARBON_DIVIDEND_BACKGROUND_SOUND': new Howl({
+    src: [CARBON_DIVIDEND_BACKGROUND_SOUND],
     loop: true,
   }),
   'SNAKE_BUMP_SOUND': new Howl({
@@ -768,25 +768,25 @@ class App extends React.Component {
   }
 
   handleBackgroundSounds() {
-    if (this.snake.getCarbonTaxed() && (!AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing())) {
+    if (this.snake.getState() === SNAKE_STATES.INVINCIBLE && (!AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing())) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].play();
+      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, 1000);
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
+    }
+    else if (this.snake.getState() !== SNAKE_STATES.INVINCIBLE && AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing()) {
+      const fadeTime = 1000 // ms
+      AUDIO_CLIPS['SOUNDTRACK'].fade(0, 1, fadeTime);
+      setTimeout(() => { AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop() }, fadeTime)
+    }
+    if (this.snake.getCarbonTaxed() && (!AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing())) {
       AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].play();
       AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, 1000);
-      AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].stop()
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
     }
     else if (!this.snake.getCarbonTaxed() && AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()) {
       const fadeTime = 1000 // ms
       AUDIO_CLIPS['SOUNDTRACK'].fade(0.4, 1, fadeTime);
       setTimeout(() => { AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop() }, fadeTime)
-    }
-    if (this.snake.getState() === SNAKE_STATES.INVINCIBLE && (!AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing())) {
-      AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].play();
-      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, 1000);
-      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
-    }
-    else if (this.snake.getState() !== SNAKE_STATES.INVINCIBLE && AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].playing()) {
-      const fadeTime = 1000 // ms
-      AUDIO_CLIPS['SOUNDTRACK'].fade(0, 1, fadeTime);
-      setTimeout(() => { AUDIO_CLIPS['GREEN_SUBSIDY_BACKGROUND_SOUND'].stop() }, fadeTime)
     }
   }
 

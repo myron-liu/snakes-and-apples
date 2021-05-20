@@ -4,10 +4,8 @@ import RED_APPLE_CRUNCH_SOUND from '../assets/sounds/red_apple_crunch_sound.mp3'
 import RED_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
 import GREEN_APPLE_CRUCH_SOUND from '../assets/sounds/green_apple_crunch_sound.mp3';
 import GREEN_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
-import GREEN_SUBSIDY_SOUND from '../assets/sounds/green_subsidy_sound.wav';
-// import GREEN_SUBSIDY_BACKGROUND_SOUND from './assets/sounds/green_subsidy_background_sound.mp3';
+import GREEN_SUBSIDY_SOUND from '../assets/sounds/green_subsidy_sound.mp3';
 import CARBON_TAX_SOUND from '../assets/sounds/carbon_tax_sound.wav';
-// import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
 import CARBON_DIVIDEND_SOUND from '../assets/sounds/carbon_dividend_sound.mp3';
 
 
