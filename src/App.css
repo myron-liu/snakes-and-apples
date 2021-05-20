@@ -77,6 +77,13 @@
   top: 0;
 }
 
+#particles_viz {
+  position: absolute;
+  z-index: 4;
+  width: 100%;
+    height: 100%;
+}
+
 .countdown-digit {
   text-align: center;
   font-size: 5em;

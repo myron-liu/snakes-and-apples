@@ -181,6 +181,10 @@ export class Snake {
     return this.points;
   }
 
+  getConcentration() {
+    return this.concentration;
+  }
+
   getTokens() {
     return this.tokens;
   }

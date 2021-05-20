@@ -69,6 +69,7 @@ import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_s
 
 import SNAKE_BUMP_SOUND from './assets/sounds/snake_bump_sound.wav';
 import WALL_BUMP_SOUND from './assets/sounds/wall_bump_sound.wav';
+import { ppmVisualizer } from './particles';
 
 let AUDIO_CLIPS = {
   'SOUNDTRACK': new Howl({
@@ -651,6 +652,8 @@ class App extends React.Component {
   componentDidMount() {
     const game = document.getElementById('game');
     this.gameCtx = game.getContext('2d');
+    this.particlesViz = new ppmVisualizer('particles_viz')
+    this.particlesViz.setParticleCount(200);
 
     window.onresize = () => { this.onWindowResize() }
     this.onWindowResize();
@@ -667,6 +670,8 @@ class App extends React.Component {
     game.height = background.height = canvasHeight;
     gameContainer.style.width = canvasWidth + "px";
     gameContainer.style.height = canvasHeight + "px"
+
+    this.particlesViz.resizeCanvas(canvasWidth, canvasHeight)
 
     const scoreContainer = document.getElementById('game_subtitle');
     scoreContainer.style.width = `${canvasWidth}px`;
@@ -717,6 +722,7 @@ class App extends React.Component {
     this.snake.generateToken();
     this.drawBackground();
     this.drawSnakeAndItems(0);
+    this.particlesViz.setParticleCount(this.snake.getConcentration())
   }
 
   startGame() {
@@ -794,6 +800,7 @@ class App extends React.Component {
         }
         this.snake.move();
         this.drawBackground();
+        this.particlesViz.setParticleCount(this.snake.getConcentration())
         frames = 0;
       }
       if (!checkCollision(this.snake)) {
@@ -817,6 +824,7 @@ class App extends React.Component {
         <div id={'game_container'}>
           <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
           <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
+          <div id={'particles_viz'} />
           {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
           {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
           {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
