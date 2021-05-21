@@ -652,7 +652,7 @@ class App extends React.Component {
   componentDidMount() {
     const game = document.getElementById('game');
     this.gameCtx = game.getContext('2d');
-    this.particlesViz = new ppmVisualizer('particles_viz')
+    this.particlesViz = new ppmVisualizer('particles-viz')
     this.particlesViz.setParticleCount(200);
 
     window.onresize = () => { this.onWindowResize() }
@@ -665,7 +665,7 @@ class App extends React.Component {
 
     const game = document.getElementById('game');
     const background = document.getElementById('background');
-    const gameContainer = document.getElementById('game_container');
+    const gameContainer = document.getElementById('game-container');
     game.width = background.width = canvasWidth;
     game.height = background.height = canvasHeight;
     gameContainer.style.width = canvasWidth + "px";
@@ -821,10 +821,10 @@ class App extends React.Component {
           <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
         </section>
-        <div id={'game_container'}>
+        <div id={'game-container'}>
           <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
           <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
-          <div id={'particles_viz'} />
+          <div id={'particles-viz'} />
           {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
           {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
           {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
