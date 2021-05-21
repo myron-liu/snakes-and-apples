@@ -13,11 +13,15 @@
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.0"
   },
+  "devDependencies": {
+    "push-dir": "^0.4.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "push-to-gh-pages": "push-dir --dir=build --branch=gh-pages --cleanup --verbose"
   },
   "eslintConfig": {
     "extends": [
