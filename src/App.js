@@ -673,7 +673,7 @@ class App extends React.Component {
 
     this.particlesViz.resizeCanvas(canvasWidth, canvasHeight)
 
-    const scoreContainer = document.getElementById('game_subtitle');
+    const scoreContainer = document.getElementById('game-subtitle');
     scoreContainer.style.width = `${canvasWidth}px`;
 
     this.drawBackground();
@@ -688,8 +688,7 @@ class App extends React.Component {
     const backgroundCtx = background.getContext('2d');
     if (this.snake.getCarbonTaxed()) {
       drawBackground(backgroundCtx, '#C6FD77', '#B1EC77');
-    }
-    else {
+    } else {
       drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
     }
   }
@@ -703,10 +702,11 @@ class App extends React.Component {
     drawTokens(this.gameCtx, this.snake.getTokens());
     drawHazards(this.gameCtx, this.snake.getHazards());
     drawHead(this.gameCtx, this.snake, frameNum);
-    if (frameNum === 0)
+    if (frameNum === 0) {
       drawProperTail(this.gameCtx, this.snake.getTail(), this.snake.getHead());
-    else
+    } else {
       drawTail(this.gameCtx, this.snake, frameNum)
+    }
   }
 
   resetGameBoard() {
@@ -817,7 +817,7 @@ class App extends React.Component {
     return (
       <article className="App">
         <h1 className={'title'}>Snakes and Apples</h1>
-        <section className={'subtitle'} id={'game_subtitle'}>
+        <section className={'subtitle'} id={'game-subtitle'}>
           <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
         </section>

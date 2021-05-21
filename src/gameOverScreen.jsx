@@ -1,4 +1,4 @@
-import './overlayScreenStyles.css'
+import './overlayScreenStyles.css';
 
 import ARROW_KEYS_TUTORIAL from './assets/arrow-keys-tutorial.png';
 
@@ -14,5 +14,4 @@ function GameOverScreenComponent(props) {
     );
 }
 
-
-export default GameOverScreenComponent
+export default GameOverScreenComponent;

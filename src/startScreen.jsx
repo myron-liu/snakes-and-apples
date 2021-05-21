@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import './overlayScreenStyles.css'
+import './overlayScreenStyles.css';
 
 import ARROW_KEYS_TUTORIAL from './assets/arrow-keys-tutorial.png';
 
@@ -21,4 +21,4 @@ StartScreenComponent.propTypes = {
     onPlayClicked: PropTypes.func,
 };
 
-export default StartScreenComponent
+export default StartScreenComponent;
