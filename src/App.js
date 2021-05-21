@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import React from 'react';
 
+import StartScreen from './startScreen'
 import { Snake, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
 import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
 import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
@@ -185,67 +186,67 @@ const SNAKE_TURNS = {
 
 const SNAKE_HEADS = {
   DEAD: {
-    [DIRECTIONS.UP] : SNAKE_HEAD_IMAGE_DEAD_UP,
-    [DIRECTIONS.DOWN] : SNAKE_HEAD_IMAGE_DEAD_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_HEAD_IMAGE_DEAD_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_HEAD_IMAGE_DEAD_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_HEAD_IMAGE_DEAD_UP,
+    [DIRECTIONS.DOWN]: SNAKE_HEAD_IMAGE_DEAD_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_HEAD_IMAGE_DEAD_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_HEAD_IMAGE_DEAD_RIGHT,
   },
   ALIVE: {
-    [DIRECTIONS.UP] : SNAKE_HEAD_IMAGE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_HEAD_IMAGE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_HEAD_IMAGE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_HEAD_IMAGE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_HEAD_IMAGE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_HEAD_IMAGE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_HEAD_IMAGE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_HEAD_IMAGE_RIGHT,
   },
   INVINCIBLE: {
-    [DIRECTIONS.UP] : SNAKE_HEAD_IMAGE_INVINCIBLE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_HEAD_IMAGE_INVINCIBLE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_HEAD_IMAGE_INVINCIBLE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_HEAD_IMAGE_INVINCIBLE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_HEAD_IMAGE_INVINCIBLE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_HEAD_IMAGE_INVINCIBLE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_HEAD_IMAGE_INVINCIBLE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_HEAD_IMAGE_INVINCIBLE_RIGHT,
   },
 }
 
 const SNAKE_HEADS_EATING = {
   ALIVE: {
-    [DIRECTIONS.UP] : SNAKE_HEAD_IMAGE_EATING_UP,
-    [DIRECTIONS.DOWN] : SNAKE_HEAD_IMAGE_EATING_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_HEAD_IMAGE_EATING_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_HEAD_IMAGE_EATING_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_HEAD_IMAGE_EATING_UP,
+    [DIRECTIONS.DOWN]: SNAKE_HEAD_IMAGE_EATING_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_HEAD_IMAGE_EATING_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_HEAD_IMAGE_EATING_RIGHT,
   },
   INVINCIBLE: {
-    [DIRECTIONS.UP] : SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_UP,
-    [DIRECTIONS.DOWN] : SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_UP,
+    [DIRECTIONS.DOWN]: SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_HEAD_IMAGE_INVINCIBLE_EATING_RIGHT,
   },
 }
 
 const SNAKE_TAILS = {
   ALIVE: {
-    [DIRECTIONS.UP] : SNAKE_TAIL_IMAGE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_TAIL_IMAGE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_TAIL_IMAGE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_TAIL_IMAGE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_TAIL_IMAGE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_TAIL_IMAGE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_TAIL_IMAGE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_TAIL_IMAGE_RIGHT,
   },
   INVINCIBLE: {
-    [DIRECTIONS.UP] : SNAKE_TAIL_IMAGE_INVINCIBLE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_TAIL_IMAGE_INVINCIBLE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_TAIL_IMAGE_INVINCIBLE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_TAIL_IMAGE_INVINCIBLE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_TAIL_IMAGE_INVINCIBLE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_TAIL_IMAGE_INVINCIBLE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_TAIL_IMAGE_INVINCIBLE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_TAIL_IMAGE_INVINCIBLE_RIGHT,
   },
 }
 
 const SNAKE_BODY = {
   ALIVE: {
-    [DIRECTIONS.UP] : SNAKE_BODY_IMAGE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_BODY_IMAGE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_BODY_IMAGE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_BODY_IMAGE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_BODY_IMAGE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_BODY_IMAGE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_BODY_IMAGE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_BODY_IMAGE_RIGHT,
   },
   INVINCIBLE: {
-    [DIRECTIONS.UP] : SNAKE_BODY_IMAGE_INVINCIBLE_UP,
-    [DIRECTIONS.DOWN] : SNAKE_BODY_IMAGE_INVINCIBLE_DOWN,
-    [DIRECTIONS.LEFT] : SNAKE_BODY_IMAGE_INVINCIBLE_LEFT,
-    [DIRECTIONS.RIGHT] : SNAKE_BODY_IMAGE_INVINCIBLE_RIGHT,
+    [DIRECTIONS.UP]: SNAKE_BODY_IMAGE_INVINCIBLE_UP,
+    [DIRECTIONS.DOWN]: SNAKE_BODY_IMAGE_INVINCIBLE_DOWN,
+    [DIRECTIONS.LEFT]: SNAKE_BODY_IMAGE_INVINCIBLE_LEFT,
+    [DIRECTIONS.RIGHT]: SNAKE_BODY_IMAGE_INVINCIBLE_RIGHT,
   },
 }
 
@@ -316,7 +317,7 @@ function drawHead(ctx, snake, frameFraction) {
   const yLocation = y * SQUARE_LENGTH;
 
   const snakeHead = !snake.isEating() || snakeState === "DEAD" ? SNAKE_HEADS[snakeState][direction] : SNAKE_HEADS_EATING[snakeState][direction];
-  switch(direction) {
+  switch (direction) {
     case DIRECTIONS.UP:
       ctx.drawImage(snakeHead, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
       break;
@@ -352,7 +353,7 @@ function drawTail(ctx, snake, frameFraction) {
           snakeTail = SNAKE_TAILS["ALIVE"][direction];
         }
       }
-      switch(direction) {
+      switch (direction) {
         case DIRECTIONS.UP:
           ctx.drawImage(snakeTail, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
           break;
@@ -374,13 +375,13 @@ function drawTail(ctx, snake, frameFraction) {
       let snakeBody = SNAKE_BODY[snakeState][direction];
       if (snake.isFading()) {
         if (snake.moveNumber % 2 === 0) {
-          snakeBody= SNAKE_BODY["INVINCIBLE"][direction];
+          snakeBody = SNAKE_BODY["INVINCIBLE"][direction];
         }
         else {
           snakeBody = SNAKE_BODY["ALIVE"][direction];
         }
       }
-      switch(direction) {
+      switch (direction) {
         case DIRECTIONS.UP:
           ctx.drawImage(snakeBody, xLocation, yLocation - frameIncrement, SQUARE_LENGTH, SQUARE_LENGTH);
           break;
@@ -414,7 +415,7 @@ function drawProperTail(ctx, tail, head) {
       direction = getYDirection(y, prevY);
     }
     if (i === tail.length - 1) {
-      switch(direction) {
+      switch (direction) {
         case DIRECTIONS.UP:
           ctx.drawImage(SNAKE_TAIL_IMAGE_UP, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
           break;
@@ -442,7 +443,7 @@ function drawProperTail(ctx, tail, head) {
         ctx.drawImage(SNAKE_TURNS[turn], xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
         continue;
       }
-      switch(direction) {
+      switch (direction) {
         case DIRECTIONS.UP:
           ctx.drawImage(SNAKE_BODY_IMAGE_UP, xLocation, yLocation, SQUARE_LENGTH, SQUARE_LENGTH);
           break;
@@ -521,7 +522,7 @@ function checkCollision(snake) {
   }
   let newX = -1;
   let newY = -1;
-  switch(direction) {
+  switch (direction) {
     case DIRECTIONS.UP:
       newX = x;
       newY = y - 1;
@@ -584,13 +585,13 @@ function beginGameLoop(ctx, snake) {
 }
 
 function onKeyDownFactory(snake) {
-  function onKeyDownCallback(e){
+  function onKeyDownCallback(e) {
     const LEFT = 37;
     const RIGHT = 39;
     const UP = 38;
     const DOWN = 40;
 
-    e =  e ||  window.event;
+    e = e || window.event;
     const direction = snake.getDirection();
     let newDirection = null;
     switch (e.keyCode) {
@@ -611,8 +612,8 @@ function onKeyDownFactory(snake) {
     }
     const tailStart = snake.getTailStart()
     const oppositeDirection = newDirection !== OPPOSITE_DIRECTIONS[direction] && newDirection !== OPPOSITE_DIRECTIONS[tailStart.direction];
-    const sameDirection = newDirection !==  direction;
-    const shouldChangeDirection = newDirection !== null && oppositeDirection && sameDirection 
+    const sameDirection = newDirection !== direction;
+    const shouldChangeDirection = newDirection !== null && oppositeDirection && sameDirection
     if (shouldChangeDirection) {
       snake.changeDirection(newDirection);
     }
@@ -634,12 +635,20 @@ function drawBackground(backgroundCtx, firstColor, secondColor) {
   }
 }
 
-function App() {
-  
-  const snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
-  useEffect(() => {
+
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { showingStartScreen: true };
+    this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
+    this.gameCtx = null; // gets set in the componentDidMount() method
+    this.startGame = this.startGame.bind(this);
+  }
+
+  componentDidMount() {
     const game = document.getElementById('game');
-    const gameCtx = game.getContext('2d');
+    this.gameCtx = game.getContext('2d');
 
     const { x, y } = game.getBoundingClientRect();
 
@@ -652,26 +661,33 @@ function App() {
 
     scoreContainer.style.marginLeft = `${x}px`;
     concentrationContainer.style.marginRight = `${window.innerWidth - x - CANVAS_WIDTH}px`
-    const backgroundCtx = background.getContext('2d');
-    
-    drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
-    window.onkeydown = onKeyDownFactory(snake);
-    snake.generateToken();
-    beginGameLoop(gameCtx, snake);    
-  });
 
-  
-  return (
-    <article className="App">
-      <h1 className={'title'}>Snakes and Apples</h1>
-      <section className={'subtitle'}>
-        <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
-        <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
-      </section>
-      <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
-      <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}/>
-    </article>
-  );
+    const backgroundCtx = background.getContext('2d');
+    drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
+
+    window.onkeydown = onKeyDownFactory(this.snake);
+    this.snake.generateToken();
+  }
+
+  startGame() {
+    beginGameLoop(this.gameCtx, this.snake);
+    this.setState({ showingStartScreen: false })
+  }
+
+  render() {
+    return (
+      <article className="App">
+        <h1 className={'title'}>Snakes and Apples</h1>
+        <section className={'subtitle'}>
+          <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
+          <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
+        </section>
+        <canvas id={'background'} className={'background'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+        <canvas id={'game'} className={'gameboard'} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+        {this.state.showingStartScreen && <StartScreen onPlayClicked={this.startGame} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></StartScreen>}
+      </article>
+    );
+  }
 }
 
 export default App;
