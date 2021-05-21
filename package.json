@@ -6,16 +6,22 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.0",
+    "howler": "^2.2.1",
+    "particles.js": "^2.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.0"
   },
+  "devDependencies": {
+    "push-dir": "^0.4.1"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "push-to-gh-pages": "push-dir --dir=build --branch=gh-pages --cleanup --verbose"
   },
   "eslintConfig": {
     "extends": [
