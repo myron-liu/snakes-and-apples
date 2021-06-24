@@ -9,6 +9,8 @@
   width: 100%;
   height: 100%;
   border: solid 1px #000000;
+  color:black;
+  border-radius: inherit;
 }
 
 .vertical-center {
@@ -19,10 +21,16 @@
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.vertical-center img {
+  width: 7rem;
 }
 
 .start-button {
-  padding: 12px 24px;
+  padding: .6rem 1.3rem;
   border: none;
   background-color: rgb(9, 107, 0);
   color: white;

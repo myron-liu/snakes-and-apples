@@ -502,19 +502,27 @@ export class Snake {
 
     // CARBON TAX rules
     const carbonTaxExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_TAX) >= 1;
-    if (this.concentration > 350 && this.moveNumber > this.lastCarbonTax + 200 && coordinates.length > 0 && !carbonTaxExists) {
-      const { x, y } = coordinates.pop();
-      this.addToken(x, y, TOKEN_TYPE.CARBON_TAX);
-      this.lastCarbonTax = this.moveNumber;
+    {
+      let { x, y } = coordinates.pop();
+      if (!carbonTaxExists) this.addToken(x, y, TOKEN_TYPE.CARBON_TAX);
     }
+    // if (this.concentration > 350 && this.moveNumber > this.lastCarbonTax + 200 && coordinates.length > 0 && !carbonTaxExists) {
+    //   const { x, y } = coordinates.pop();
+    //   this.addToken(x, y, TOKEN_TYPE.CARBON_TAX);
+    //   this.lastCarbonTax = this.moveNumber;
+    // }
 
     // CARBON DIVIDEND rules
     const carbonDividendExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_DIVIDEND) >= 1;
-    if (this.concentration > 360 && this.moveNumber > this.lastCarbonDividend + 500 && coordinates.length > 0 && !carbonDividendExists) {
-      const { x, y } = coordinates.pop();
-      this.addToken(x, y, TOKEN_TYPE.CARBON_DIVIDEND);
-      this.lastCarbonDividend = this.moveNumber;
+    {
+      let { x, y } = coordinates.pop();
+      if (!carbonDividendExists) this.addToken(x, y, TOKEN_TYPE.CARBON_DIVIDEND);
     }
+    // if (this.concentration > 360 && this.moveNumber > this.lastCarbonDividend + 500 && coordinates.length > 0 && !carbonDividendExists) {
+    //   const { x, y } = coordinates.pop();
+    //   this.addToken(x, y, TOKEN_TYPE.CARBON_DIVIDEND);
+    //   this.lastCarbonDividend = this.moveNumber;
+    // }
   }
 
   /** Moves the snake in the direction it is currently moving in. */
