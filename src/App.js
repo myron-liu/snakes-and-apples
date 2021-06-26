@@ -6,6 +6,7 @@ import './App.css';
 import StartScreen from './startScreen'
 import GameOverScreen from './gameOverScreen'
 import { Snake, SNAKE_STATES, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
+import { ppmVisualizer } from './particles';
 
 import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
 import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
@@ -67,11 +68,19 @@ import SOUNDTRACK from './assets/sounds/soundtrack.wav';
 import CARBON_DIVIDEND_BACKGROUND_SOUND from './assets/sounds/carbon_dividend_background_sound.wav';
 import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
 
+import RED_APPLE_CRUNCH_SOUND from './assets/sounds/red_apple_crunch_sound.mp3';
+import RED_PIE_SOUND from './assets/sounds/green_pie_sound.mp3';
+import GREEN_APPLE_CRUCH_SOUND from './assets/sounds/green_apple_crunch_sound.mp3';
+import GREEN_PIE_SOUND from './assets/sounds/green_pie_sound.mp3';
+import GREEN_SUBSIDY_SOUND from './assets/sounds/green_subsidy_sound.mp3';
+import CARBON_TAX_SOUND from './assets/sounds/carbon_tax_sound.wav';
+import CARBON_DIVIDEND_SOUND from './assets/sounds/carbon_dividend_sound.mp3';
 import SNAKE_BUMP_SOUND from './assets/sounds/snake_bump_sound.wav';
 import WALL_BUMP_SOUND from './assets/sounds/wall_bump_sound.wav';
-import { ppmVisualizer } from './particles';
 
-let MIN_DELAY_BETWEEN_SOUND_EFFECTS = 500 // (ms)
+const MIN_DELAY_BETWEEN_SOUND_EFFECTS = 500 // (ms)
+const AUDIO_FADE_TIME = 1000 // ms
+const AUDIO_SLOWING_RATE = 0.002; // rate change per frame when the carbon dividend effect is ending
 let AUDIO_CLIPS = {
   'SOUNDTRACK': new Howl({
     src: [SOUNDTRACK],
@@ -90,7 +99,28 @@ let AUDIO_CLIPS = {
   }),
   'WALL_BUMP_SOUND': new Howl({
     src: [WALL_BUMP_SOUND],
-  })
+  }),
+  'RED_APPLE_CRUNCH_SOUND': new Howl({
+    src: [RED_APPLE_CRUNCH_SOUND],
+  }),
+  'RED_PIE_SOUND': new Howl({
+    src: [RED_PIE_SOUND],
+  }),
+  'GREEN_APPLE_CRUNCH_SOUND': new Howl({
+    src: [GREEN_APPLE_CRUCH_SOUND],
+  }),
+  'GREEN_PIE_SOUND': new Howl({
+    src: [GREEN_PIE_SOUND],
+  }),
+  'CARBON_TAX_SOUND': new Howl({
+    src: [CARBON_TAX_SOUND],
+  }),
+  'CARBON_DIVIDEND_SOUND': new Howl({
+    src: [CARBON_DIVIDEND_SOUND],
+  }),
+  'GREEN_SUBSIDY_SOUND': new Howl({
+    src: [GREEN_SUBSIDY_SOUND],
+  }),
 }
 
 let canvasWidth = window.innerWidth * 0.80;
@@ -683,6 +713,7 @@ class App extends React.Component {
       if (!this.fireHazardHasAppeared && hazardType === HAZARD_TYPE.FIRE) {
         this.fireHazardHasAppeared = true;
         this.particlesViz.setEnabled(true);
+        this.particlesViz.setParticleSource();
       }
     }
   }
@@ -787,42 +818,51 @@ class App extends React.Component {
    * CARBON_TAX_BACKGROUND_SOUND is when the snake eats the tax icon & the board goes green.
    */
   handleBackgroundSounds() {
-    const fadeTime = 1000 // ms
-
     // handle fading in/out the main soundtrack
     let soundtrackVolume = AUDIO_CLIPS["SOUNDTRACK"].volume()
     if (this.snake.getCarbonTaxed()) {
       if (soundtrackVolume === 1) {
-        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, fadeTime);
+        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, AUDIO_FADE_TIME);
       }
     } else if (this.snake.getState() === SNAKE_STATES.INVINCIBLE) {
       if (soundtrackVolume === 1) {
-        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, fadeTime);
+        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, AUDIO_FADE_TIME);
       }
     } else {
       if (soundtrackVolume === 0 || soundtrackVolume === 0.4) {
-        AUDIO_CLIPS['SOUNDTRACK'].fade(soundtrackVolume, 1, fadeTime);
+        AUDIO_CLIPS['SOUNDTRACK'].fade(soundtrackVolume, 1, AUDIO_FADE_TIME);
       }
     }
 
     // handle playing/stopping the carbon dividend soundtrack
-    let isInvincible = this.snake.getState() === SNAKE_STATES.INVINCIBLE
-    let dividendSoundIsPlaying = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing()
-    console.log(dividendSoundIsPlaying)
+    const isInvincible = this.snake.getState() === SNAKE_STATES.INVINCIBLE
+    const dividendSoundIsPlaying = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing()
+    const dividendSoundVolume = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].volume()
+    const dividendSoundRate = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate()
     if (isInvincible && !dividendSoundIsPlaying) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].volume(1)
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate(1)
       AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].play();
     } else if (isInvincible && this.snake.isFading()) {
-      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate(0.75);
-    } else if (!isInvincible && dividendSoundIsPlaying) {
-      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].fade(0.5, 0, fadeTime);
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate(dividendSoundRate - AUDIO_SLOWING_RATE);
+    } else if (!isInvincible && dividendSoundIsPlaying && dividendSoundVolume === 1) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].fade(1, 0, AUDIO_FADE_TIME);
+      setTimeout(() => {
+        if (!isInvincible && dividendSoundIsPlaying) AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop();
+      }, AUDIO_FADE_TIME)
     }
 
     // handle playing/stopping the carbon tax "nature" soundtrack
-    let taxSoundPlaying = AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()
+    const taxSoundPlaying = AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()
+    const taxSoundVolume = AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].volume()
     if (this.snake.getCarbonTaxed() && !taxSoundPlaying) {
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].volume(1)
       AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].play();
-    } else if (!this.snake.getCarbonTaxed() && taxSoundPlaying) {
-      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].fade(1, 0, fadeTime);
+    } else if (!this.snake.getCarbonTaxed() && taxSoundPlaying && taxSoundVolume === 1) {
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].fade(1, 0, AUDIO_FADE_TIME);
+      setTimeout(() => {
+        if (!this.snake.getCarbonTaxed() && taxSoundPlaying) AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop();
+      }, AUDIO_FADE_TIME)
     }
   }
 
@@ -837,6 +877,35 @@ class App extends React.Component {
     if (timeNow - this.lastSoundEffectStartTime < MIN_DELAY_BETWEEN_SOUND_EFFECTS && force !== true) { return };
     if (AUDIO_CLIPS[soundName].playing()) { return };
     AUDIO_CLIPS[soundName].play()
+    this.lastSoundEffectStartTime = timeNow;
+  }
+
+  playTokenSound(tokenType) {
+    switch (tokenType) {
+      case TOKEN_TYPE.RED_APPLE:
+        this.playSoundEffect('RED_APPLE_CRUNCH_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_APPLE:
+        this.playSoundEffect('GREEN_APPLE_CRUNCH_SOUND');
+        break;
+      case TOKEN_TYPE.RED_PIE:
+        this.playSoundEffect('RED_PIE_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_PIE:
+        this.playSoundEffect('GREEN_PIE_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_SUBSIDY:
+        this.playSoundEffect('GREEN_SUBSIDY_SOUND');
+        break;
+      case TOKEN_TYPE.CARBON_TAX:
+        this.playSoundEffect('CARBON_TAX_SOUND');
+        break;
+      case TOKEN_TYPE.CARBON_DIVIDEND:
+        this.playSoundEffect('CARBON_DIVIDEND_SOUND');
+        break;
+      default:
+        break;
+    }
   }
 
   beginGameLoop() {
@@ -852,7 +921,8 @@ class App extends React.Component {
           this.gameOver();
           return;
         }
-        this.snake.move();
+        let tokenConsumed = this.snake.move();
+        this.playTokenSound(tokenConsumed);
         this.drawBackground();
 
         frames = 0;
