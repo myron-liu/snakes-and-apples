@@ -21,6 +21,17 @@ export class ppmVisualizer {
         }
     }
 
+    /** sets the particles to start from a point and radiate out
+     * @param x the x (from left) pixel in the canvas to start the explosion
+     * @param y ditto for y (from top)
+     */
+    explodeFromPoint(x, y) {
+        for (const p of this.pJSViz.particles.array) {
+            p.x = x;
+            p.y = y;
+        }
+    }
+
     setParticleCount(count) {
         const x = (count - BASE_PARTICLE_COUNT);
         const xScale = -0.007 // controls the rate at which particles get added

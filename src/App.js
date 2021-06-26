@@ -668,7 +668,7 @@ class App extends React.Component {
     this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
     this.gameCtx = null; // gets set in the componentDidMount() method
     this.lastSoundEffectStartTime = 0; // records the last time a sound effect was played in unix epoch time [ms] (to avoid playing sound effects too frequently)
-    this.fireHazardHasAppeared = false; // set to true if the fire hazard is shown.
+    this.fireHazardCount = 0; // counts how many fire hazards are shown.
   }
 
   componentDidMount() {
@@ -704,17 +704,27 @@ class App extends React.Component {
 
   drawHazards() {
     let hazards = this.snake.getHazards();
+    let fireCount = 0;
+    let newFireX = 0;
+    let newFireY = 0;
     for (let i = 0; i < hazards.length; i++) {
       const { x, y, hazardType } = hazards[i];
       const image = HAZARD_IMAGES[hazardType];
       const xLocation = x * squareLength;
       const yLocation = y * squareLength;
       this.gameCtx.drawImage(image, xLocation, yLocation, squareLength, squareLength);
-      if (!this.fireHazardHasAppeared && hazardType === HAZARD_TYPE.FIRE) {
-        this.fireHazardHasAppeared = true;
-        this.particlesViz.setEnabled(true);
-        this.particlesViz.setParticleSource();
+
+      if (hazardType === HAZARD_TYPE.FIRE) {
+        fireCount++;
+        newFireX = xLocation + squareLength / 2;
+        newFireY = yLocation + squareLength / 2;
       }
+    }
+    if (this.fireHazardCount !== fireCount) {
+      this.fireHazardCount = fireCount;
+      this.particlesViz.setEnabled(true);
+      this.particlesViz.setParticleCount(Math.min(fireCount * 200, 600))
+      this.particlesViz.explodeFromPoint(newFireX, newFireY);
     }
   }
 
@@ -805,6 +815,7 @@ class App extends React.Component {
       if (scoreElem) {
         scoreElem.innerHTML = this.snake.points;
       }
+      this.fireHazardCount = 0;
       this.resetGameBoard()
       this.startCountdown()
     };
@@ -928,7 +939,6 @@ class App extends React.Component {
         frames = 0;
       }
       if (!checkCollision(this.snake)) {
-        if (this.fireHazardHasAppeared) this.particlesViz.setParticleCount(this.snake.getConcentration())
         this.drawSnakeAndItems(frames / TOTAL_FRAMES_PER_SQUARE);
         this.handleBackgroundSounds()
       }
