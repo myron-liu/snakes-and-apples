@@ -1,5 +1,5 @@
 import React from 'react';
-import { Howl } from "howler"
+import { Howl, Howler } from "howler"
 
 import './App.css';
 
@@ -63,6 +63,9 @@ import CARBON_DIVIDEND from './assets/carbon-dividend.png';
 import DROUGHT from './assets/drought.png';
 import FIRE from './assets/fire.png';
 import FLOOD from './assets/flood.png';
+
+import MUTE_ICON from './assets/mute_icon.svg';
+import UNMUTE_ICON from './assets/unmute_icon.svg';
 
 import SOUNDTRACK from './assets/sounds/soundtrack.wav';
 import CARBON_DIVIDEND_BACKGROUND_SOUND from './assets/sounds/carbon_dividend_background_sound.wav';
@@ -664,6 +667,7 @@ class App extends React.Component {
       showingStartScreen: true,
       showingGameOverScreen: false,
       countDownDigit: 0,
+      muted: false,
     };
     this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
     this.gameCtx = null; // gets set in the componentDidMount() method
@@ -919,6 +923,12 @@ class App extends React.Component {
     }
   }
 
+  toggleMute() {
+    this.setState({ muted: !this.state.muted })
+    Howler.mute(!this.state.muted);
+    this.drawBackground();
+  }
+
   beginGameLoop() {
     let frames = 0;
     ///------------------ Main Game Loop --------------------------------------------------
@@ -956,6 +966,7 @@ class App extends React.Component {
         <section className={'subtitle'} id={'game-subtitle'}>
           <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
           <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
+          <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
         </section>
         <div id={'game-container'}>
           <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />

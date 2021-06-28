@@ -21,6 +21,7 @@
 .subtitle {
   margin: auto;
   font-size: 1rem;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -37,6 +38,15 @@
 
 .title {
   font-size: 1.3rem;
+}
+
+.mute-button {
+  position: absolute;
+right: 0;
+top: -3em;
+width: 3em;
+background: white;
+border-radius: 8px;
 }
 
 #game-container {
