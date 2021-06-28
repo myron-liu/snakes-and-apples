@@ -991,6 +991,7 @@ class App extends React.Component {
             {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
             {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
           </div>
+          <a href="https://artworksforchange.org" className={'credits-link'}>Credits</a>
         </div>
       </article>
     );
