@@ -704,8 +704,8 @@ class App extends React.Component {
 
     this.particlesViz.resizeCanvas(canvasWidth, canvasHeight)
 
-    const scoreContainer = document.getElementById('game-subtitle');
-    scoreContainer.style.width = `${canvasWidth}px`;
+    const gameLayoutContainer = document.getElementById('game-layout-container');
+    gameLayoutContainer.style.width = `${canvasWidth}px`;
 
     this.drawBackground();
     if (this.state.showingStartScreen === false) this.drawSnakeAndItems(0);
@@ -953,7 +953,7 @@ class App extends React.Component {
         this.drawBackground();
 
         frames = 0;
-         // ============================================================================
+        // ============================================================================
       }
       if (collided_obstacle_type == null) {
         this.drawSnakeAndItems(frames / TOTAL_FRAMES_PER_SQUARE);
@@ -972,19 +972,25 @@ class App extends React.Component {
   render() {
     return (
       <article className="App">
-        <h1 className={'title'}>Snakes and Apples</h1>
-        <section className={'subtitle'} id={'game-subtitle'}>
-          <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
-          <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
-          <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
-        </section>
-        <div id={'game-container'}>
-          <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
-          <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
-          <div id={'particles-viz'} />
-          {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
-          {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
-          {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
+        <div id="game-layout-container">
+          <section className={'title-bar'}>
+            <a href="https://artworksforchange.org" className={'learn-link'}>/ Learn \<br></br>\ More /</a>
+            <h1 className={'title'}>Snakes and Apples </h1>
+            <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
+          </section>
+          <section className={'subtitle'} id={'game-subtitle'}>
+            <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
+            <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
+
+          </section>
+          <div id={'game-container'}>
+            <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
+            <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
+            <div id={'particles-viz'} />
+            {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
+            {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
+            {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
+          </div>
         </div>
       </article>
     );
