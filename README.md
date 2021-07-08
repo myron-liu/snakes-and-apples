@@ -1,9 +1,7 @@
 ## Setup Steps:
 
 1. Get NodeJS from: https://nodejs.org/en/download
-2. In Finder or File Explorer, right click (or ctrl+click) on the folder where you want the source code folder to go.
-   - On Mac: In the right click menu click "Services" > "New Terminal at Folder"
-   - On Windows: Hold Shift while you Right Click on the Folder.
+2. Open a terminal where you want to put the code repo folder [How?](https://www.groovypost.com/howto/open-command-window-terminal-window-specific-folder-windows-mac-linux/)
 3. Get this source code by typing `git clone https://github.com/myron-liu/snakes-and-apples.git` into your terminal/cmd prompt (then press return)
    - If it say something like "Git: command not found" you might need to get GIT from https://git-scm.com/downloads or the XCode Command Line tools on Mac.
 4. Type `cd ./snakes-and-apples` (then press return) to get into the snakes-and-apples folder.
@@ -11,14 +9,12 @@
 
 ## Running & playing the game in development:
 
-1. In Finder or File Explorer, right click (ctl+click) on the "snakes-and-apples" folder.
-   - On Mac: In the right click menu click "Services" > "New Terminal at Folder"
-   - On Windows: Hold Shift while you Right Click on the Folder.
+1. Open a new terminal/cmd propt to the "snakes-and-apples" folder [How?](https://www.groovypost.com/howto/open-command-window-terminal-window-specific-folder-windows-mac-linux/).
 2. Type `npm run start` in the terminal and it should build the project with create-react-app, and start a development server (so you can preview the project at a url like: http://localhost:xxxx - The exact url it will show in your terminal).
 
 ## How to deploy the game to Github Pages:
 
-1. Open the folder in terminal or cmd prompt like you would to run the game.
+1. Open the folder in terminal or cmd prompt like you would to run the game [How?](https://www.groovypost.com/howto/open-command-window-terminal-window-specific-folder-windows-mac-linux/).
 2. Type `npm run build` in the terminal and it should build the project into a folder called build with the index.html.
 3. Type `npm run push-to-gh-pages` and it will upload the build folder to a git branch called "gh-pages" which github automatically serves as gh-pages.
     1. If it says something like "Git not clean":

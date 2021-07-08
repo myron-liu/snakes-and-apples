@@ -1,23 +1,62 @@
 import { } from 'particles.js'
 import PARTICLES_CONFIG_JSON from './particlesConfig.json'
 
+const BASE_PARTICLE_COUNT = 278;
+
 export class ppmVisualizer {
     constructor(containerElementId) {
         window.particlesJS(containerElementId, PARTICLES_CONFIG_JSON);
         this.pJSViz = window.pJSDom[0].pJS;
+        this.enabled = false;
+    }
+
+    setEnabled(isEnabled) {
+        this.enabled = isEnabled
+        if (this.enabled) {
+            this.pJSViz.particles.number.value = PARTICLES_CONFIG_JSON.particles.number.value;
+            this.reInitParticles()
+        } else {
+            this.pJSViz.particles.number.value = 0;
+            this.pJSViz.fn.particlesEmpty()
+        }
+    }
+
+    /** sets the particles to start from a point and radiate out
+     * @param x the x (from left) pixel in the canvas to start the explosion
+     * @param y ditto for y (from top)
+     */
+    explodeFromPoint(x, y) {
+        for (const p of this.pJSViz.particles.array) {
+            p.x = x;
+            p.y = y;
+        }
     }
 
     setParticleCount(count) {
-        const startParticleCount = 278;
-
-        // copy-paste on https://desmos.com/calculator 2^{\left(-0.007x\ +10\right)}+3
-        const x = (count - startParticleCount);
+        const x = (count - BASE_PARTICLE_COUNT);
         const xScale = -0.007 // controls the rate at which particles get added
         const xOffset = 10; // controls the inital number of particles (but it's math, look at the desmos)
         const particleInverseDensity = Math.pow(2, x * xScale + xOffset) + 3
-
+        //
+        //     to visualize ^this curve^ copy-paste formula below on https://desmos.com/calculator :
+        //     2^{\left(-0.007x\ +10\right)}+3
+        //
         this.pJSViz.particles.number.density.value_area = particleInverseDensity
         this.pJSViz.fn.vendors.densityAutoParticles(); // library function here: https://github.com/VincentGarreau/particles.js/blob/d01286d6dcd61f497d07cc62bd48e692f6508ad5/particles.js#L1164
+    }
+
+    reInitParticles() {
+        // this code from library here: https://github.com/VincentGarreau/particles.js/blob/d01286d6dcd61f497d07cc62bd48e692f6508ad5/particles.js#L198
+        /* repaint canvas on anim disabled */
+        if (!this.pJSViz.particles.move.enable) {
+            this.pJSViz.fn.particlesEmpty();
+            this.pJSViz.fn.particlesCreate();
+            this.pJSViz.fn.particlesDraw();
+            this.pJSViz.fn.vendors.densityAutoParticles();
+        }
+
+        /* density particles enabled */
+        this.pJSViz.fn.vendors.densityAutoParticles();
     }
 
     resizeCanvas(width, height) {
@@ -34,15 +73,6 @@ export class ppmVisualizer {
         this.pJSViz.canvas.el.width = this.pJSViz.canvas.w;
         this.pJSViz.canvas.el.height = this.pJSViz.canvas.h;
 
-        /* repaint canvas on anim disabled */
-        if (!this.pJSViz.particles.move.enable) {
-            this.pJSViz.fn.particlesEmpty();
-            this.pJSViz.fn.particlesCreate();
-            this.pJSViz.fn.particlesDraw();
-            this.pJSViz.fn.vendors.densityAutoParticles();
-        }
-
-        /* density particles enabled */
-        this.pJSViz.fn.vendors.densityAutoParticles();
+        if (this.enabled) this.reInitParticles()
     }
 }
