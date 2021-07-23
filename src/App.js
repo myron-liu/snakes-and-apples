@@ -974,7 +974,7 @@ class App extends React.Component {
       <article className="App">
         <div id="game-layout-container">
           <section className={'title-bar'}>
-            <a href="https://artworksforchange.org" className={'learn-link'} target="_blank" rel="noopener noreferrer">/ Learn \<br></br>\ More /</a>
+            <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vRTTFMQzqHk4kxRdp1Q_66Ug-MkLma9_HTyk-2JrtDeKG_z8n_5sg3vAuaCHtTAQxsMK72lNx3IheEN/pub" className={'learn-link'} target="_blank" rel="noopener noreferrer">/ Learn \<br></br>\ More /</a>
             <h1 className={'title'}>Snakes and Apples </h1>
             <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
           </section>
@@ -991,7 +991,7 @@ class App extends React.Component {
             {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
             {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
           </div>
-          <a href="https://artworksforchange.org" className={'credits-link'} target="_blank" rel="noopener noreferrer">Credits</a>
+          <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vRTTFMQzqHk4kxRdp1Q_66Ug-MkLma9_HTyk-2JrtDeKG_z8n_5sg3vAuaCHtTAQxsMK72lNx3IheEN/pub" className={'credits-link'} target="_blank" rel="noopener noreferrer">Credits</a>
         </div>
       </article>
     );
