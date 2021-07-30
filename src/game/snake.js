@@ -1,4 +1,4 @@
-const DEBUG_CHEATS_ON = true;
+const DEBUG_CHEATS_ON = false;
 
 /** Enum repsenting the token type. */
 export const TOKEN_TYPE = {
