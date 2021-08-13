@@ -8,7 +8,7 @@ function GameOverScreenComponent(props) {
             <div className="vertical-center">
                 <h1>GAME OVER</h1>
                 <img src={ARROW_KEYS_TUTORIAL} className="key-tutorial" alt=""></img>
-                <p><b>Press any key to restart.</b></p>
+                <p><b>Restarting...</b></p>
             </div>
         </section>
     );

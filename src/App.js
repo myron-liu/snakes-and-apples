@@ -812,24 +812,30 @@ class App extends React.Component {
   }
 
   gameOver() {
+    AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
+    AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
     this.snake.setStateToDead();
     this.drawSnakeAndItems(0)
     this.setState({ showingGameOverScreen: true })
     window.onkeydown = null;
-    window.onkeydown = () => {
+    setTimeout(() => {
       window.onkeydown = null;
       this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
       this.snake.points = 0;
+      this.snake.concentration = 278;
+      this.fireHazardCount = 0;
+      this.resetGameBoard()
+      this.startCountdown()
+      // update page to reflect reset score & concentration:
       const scoreElem = document.getElementById('score');
       if (scoreElem) {
         scoreElem.innerHTML = this.snake.points;
       }
-      this.fireHazardCount = 0;
-      this.resetGameBoard()
-      this.startCountdown()
-    };
-    AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
-    AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
+      const concentrationElem = document.getElementById('concentration');
+      if (concentrationElem) {
+        concentrationElem.innerHTML = this.snake.concentration;
+      }
+    }, 1000); // wait one second before doing the above function
   }
 
   /**
@@ -974,9 +980,13 @@ class App extends React.Component {
       <article className="App">
         <div id="game-layout-container">
           <section className={'title-bar'}>
-            <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vRTTFMQzqHk4kxRdp1Q_66Ug-MkLma9_HTyk-2JrtDeKG_z8n_5sg3vAuaCHtTAQxsMK72lNx3IheEN/pub" className={'learn-link'} target="_blank" rel="noopener noreferrer">/ Learn \<br></br>\ More /</a>
-            <h1 className={'title'}>Snakes and Apples </h1>
             <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
+            <h1 className={'title'}>Snakes and Apples </h1>
+            <div className={'learn-links'}>
+              <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vRTTFMQzqHk4kxRdp1Q_66Ug-MkLma9_HTyk-2JrtDeKG_z8n_5sg3vAuaCHtTAQxsMK72lNx3IheEN/pub" target="_blank" rel="noopener noreferrer">Learn More</a>
+              <br></br>
+              <a href="https://www.artworksforchange.org" target="_blank" rel="noopener noreferrer">Credits</a>
+            </div>
           </section>
           <section className={'subtitle'} id={'game-subtitle'}>
             <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
@@ -991,7 +1001,6 @@ class App extends React.Component {
             {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
             {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
           </div>
-          <a href="https://www.artworksforchange.org" className={'credits-link'} target="_blank" rel="noopener noreferrer">Credits</a>
         </div>
       </article>
     );
