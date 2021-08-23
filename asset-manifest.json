@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.1ba2b439.chunk.css",
-    "main.js": "/static/js/main.14c2f008.chunk.js",
-    "main.js.map": "/static/js/main.14c2f008.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.bdf85c97.js",
-    "runtime-main.js.map": "/static/js/runtime-main.bdf85c97.js.map",
-    "static/js/2.39ad70da.chunk.js": "/static/js/2.39ad70da.chunk.js",
-    "static/js/2.39ad70da.chunk.js.map": "/static/js/2.39ad70da.chunk.js.map",
-    "static/js/3.b38df983.chunk.js": "/static/js/3.b38df983.chunk.js",
-    "static/js/3.b38df983.chunk.js.map": "/static/js/3.b38df983.chunk.js.map",
+    "main.css": "/static/css/main.7cba055d.chunk.css",
+    "main.js": "/static/js/main.86d36215.chunk.js",
+    "main.js.map": "/static/js/main.86d36215.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.89cc5937.js",
+    "runtime-main.js.map": "/static/js/runtime-main.89cc5937.js.map",
+    "static/js/2.14ffca70.chunk.js": "/static/js/2.14ffca70.chunk.js",
+    "static/js/2.14ffca70.chunk.js.map": "/static/js/2.14ffca70.chunk.js.map",
+    "static/js/3.dfedd363.chunk.js": "/static/js/3.dfedd363.chunk.js",
+    "static/js/3.dfedd363.chunk.js.map": "/static/js/3.dfedd363.chunk.js.map",
     "index.html": "/index.html",
-    "static/css/main.1ba2b439.chunk.css.map": "/static/css/main.1ba2b439.chunk.css.map",
-    "static/js/2.39ad70da.chunk.js.LICENSE.txt": "/static/js/2.39ad70da.chunk.js.LICENSE.txt",
+    "static/css/main.7cba055d.chunk.css.map": "/static/css/main.7cba055d.chunk.css.map",
+    "static/js/2.14ffca70.chunk.js.LICENSE.txt": "/static/js/2.14ffca70.chunk.js.LICENSE.txt",
     "static/media/carbon-dividend.d2d287f0.png": "/static/media/carbon-dividend.d2d287f0.png",
     "static/media/carbon-tax.6cfa09f7.png": "/static/media/carbon-tax.6cfa09f7.png",
     "static/media/carbon_dividend_background_sound.a66e992a.wav": "/static/media/carbon_dividend_background_sound.a66e992a.wav",
@@ -65,9 +65,9 @@
     "static/media/wall_bump_sound.6f8aedc9.wav": "/static/media/wall_bump_sound.6f8aedc9.wav"
   },
   "entrypoints": [
-    "static/js/runtime-main.bdf85c97.js",
-    "static/js/2.39ad70da.chunk.js",
-    "static/css/main.1ba2b439.chunk.css",
-    "static/js/main.14c2f008.chunk.js"
+    "static/js/runtime-main.89cc5937.js",
+    "static/js/2.14ffca70.chunk.js",
+    "static/css/main.7cba055d.chunk.css",
+    "static/js/main.86d36215.chunk.js"
   ]
 }
