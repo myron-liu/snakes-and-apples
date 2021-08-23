@@ -2,7 +2,7 @@
 
 1. Get NodeJS from: https://nodejs.org/en/download
 2. Open a terminal where you want to put the code repo folder [How?](https://www.groovypost.com/howto/open-command-window-terminal-window-specific-folder-windows-mac-linux/)
-3. Get this source code by typing `git clone https://github.com/myron-liu/snakes-and-apples.git` into your terminal/cmd prompt (then press return)
+3. Get this source code by typing `git clone https://github.com/myron-liu/snakes-and-apples.git` into your terminal or cmd prompt (then press return)
    - If it say something like "Git: command not found" you might need to get GIT from https://git-scm.com/downloads or the XCode Command Line tools on Mac.
 4. Type `cd ./snakes-and-apples` (then press return) to get into the snakes-and-apples folder.
 5. Type `npm install` (then press return) in the terminal to install dependancies (React & other JS libraries)
@@ -15,13 +15,13 @@
 ## How to deploy the game to Github Pages:
 
 1. Open the folder in terminal or cmd prompt like you would to run the game [How?](https://www.groovypost.com/howto/open-command-window-terminal-window-specific-folder-windows-mac-linux/).
-2. Type `npm run build` in the terminal and it should build the project into a folder called build with the index.html.
-3. Type `npm run push-to-gh-pages` and it will upload the build folder to a git branch called "gh-pages" which github automatically serves as gh-pages.
-    1. If it says something like "Git not clean":
+2. Type `npm run deploy-gh-pages` and it will automatically run `npm run build` to build the project into a folder called build with the index.html. Then it will upload that build folder to a git branch called "gh-pages" which github can serve as a github pages link.
+    1. If gives some error "Git not clean":
+         1. Ask Myron about push access to the repository
          1. Commit any changes you have to git by running `git add -A` and then `git commit -m "Put a short description of any changes you made"`
-         2. Try running `npm run push-to-gh-pages` again.
-         3. Ask Myron about push access to the repository
-4. After 5-10 minutes, the pages url can be found on the "pages" setting for the repository on github.com.
+         2. Try running `npm run deploy-gh-pages` again.
+
+3. After 5-10 minutes, the pages url can be found on the "pages" setting for the repository on github.com.
    1. The first time around you might have to select the "gh-pages" branch and click publish on the github repo "pages" settings.
 
 # Getting Started with Create React App

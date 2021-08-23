@@ -811,31 +811,39 @@ class App extends React.Component {
     }, 3)
   }
 
+  restartGame() {
+    window.onkeydown = null;
+    window.onmousedown = null;
+    this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
+    this.snake.points = 0;
+    this.snake.concentration = 278;
+    this.fireHazardCount = 0;
+    this.resetGameBoard()
+    this.startCountdown()
+    // update page to reflect reset score & concentration:
+    const scoreElem = document.getElementById('score');
+    if (scoreElem) {
+      scoreElem.innerHTML = this.snake.points;
+    }
+    const concentrationElem = document.getElementById('concentration');
+    if (concentrationElem) {
+      concentrationElem.innerHTML = this.snake.concentration;
+    }
+  }
+
   gameOver() {
     AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
     AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
     this.snake.setStateToDead();
     this.drawSnakeAndItems(0)
     this.setState({ showingGameOverScreen: true })
-    window.onkeydown = null;
-    setTimeout(() => {
-      window.onkeydown = null;
-      this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
-      this.snake.points = 0;
-      this.snake.concentration = 278;
-      this.fireHazardCount = 0;
-      this.resetGameBoard()
-      this.startCountdown()
-      // update page to reflect reset score & concentration:
-      const scoreElem = document.getElementById('score');
-      if (scoreElem) {
-        scoreElem.innerHTML = this.snake.points;
-      }
-      const concentrationElem = document.getElementById('concentration');
-      if (concentrationElem) {
-        concentrationElem.innerHTML = this.snake.concentration;
-      }
-    }, 1000); // wait one second before doing the above function
+    window.onkeydown = (event) => {
+      if (event.key === " ") this.restartGame();
+    }
+    document.getElementById('game-container').onclick = (event) => {
+      document.getElementById('game-container').onclick = null;
+      this.restartGame();
+    }
   }
 
   /**
