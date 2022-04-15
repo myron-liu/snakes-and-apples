@@ -1,11 +1,12 @@
 import React from 'react';
-import { Howl } from "howler"
+import { Howl, Howler } from "howler"
 
 import './App.css';
 
 import StartScreen from './startScreen'
 import GameOverScreen from './gameOverScreen'
 import { Snake, SNAKE_STATES, DIRECTIONS, OPPOSITE_DIRECTIONS, GAME_WIDTH, GAME_HEIGHT, TOKEN_TYPE, HAZARD_TYPE } from './game/snake.js'
+import { ppmVisualizer } from './particles';
 
 import SNAKE_HEAD_LEFT from './assets/snake-head-left.png';
 import SNAKE_HEAD_RIGHT from './assets/snake-head-right.png';
@@ -63,14 +64,27 @@ import DROUGHT from './assets/drought.png';
 import FIRE from './assets/fire.png';
 import FLOOD from './assets/flood.png';
 
+import MUTE_ICON from './assets/mute_icon.svg';
+import UNMUTE_ICON from './assets/unmute_icon.svg';
+
 import SOUNDTRACK from './assets/sounds/soundtrack.wav';
 import CARBON_DIVIDEND_BACKGROUND_SOUND from './assets/sounds/carbon_dividend_background_sound.wav';
 import CARBON_TAX_BACKGROUND_SOUND from './assets/sounds/carbon_tax_background_sound.mp3';
 
+import RED_APPLE_CRUNCH_SOUND from './assets/sounds/red_apple_crunch_sound.mp3';
+import RED_PIE_SOUND from './assets/sounds/green_pie_sound.mp3';
+import GREEN_APPLE_CRUCH_SOUND from './assets/sounds/green_apple_crunch_sound.mp3';
+import GREEN_PIE_SOUND from './assets/sounds/green_pie_sound.mp3';
+import GREEN_SUBSIDY_SOUND from './assets/sounds/green_subsidy_sound.mp3';
+import CARBON_TAX_SOUND from './assets/sounds/carbon_tax_sound.wav';
+import CARBON_DIVIDEND_SOUND from './assets/sounds/carbon_dividend_sound.mp3';
 import SNAKE_BUMP_SOUND from './assets/sounds/snake_bump_sound.wav';
 import WALL_BUMP_SOUND from './assets/sounds/wall_bump_sound.wav';
-import { ppmVisualizer } from './particles';
+import COLLISON_NEAR_MISS_SOUND from './assets/sounds/collision_near_miss_sound.wav'
 
+const MIN_DELAY_BETWEEN_SOUND_EFFECTS = 350 // (ms)
+const AUDIO_FADE_TIME = 1000 // ms
+const AUDIO_SLOWING_RATE = 0.002; // rate change per frame when the carbon dividend effect is ending
 let AUDIO_CLIPS = {
   'SOUNDTRACK': new Howl({
     src: [SOUNDTRACK],
@@ -89,7 +103,31 @@ let AUDIO_CLIPS = {
   }),
   'WALL_BUMP_SOUND': new Howl({
     src: [WALL_BUMP_SOUND],
-  })
+  }),
+  'RED_APPLE_CRUNCH_SOUND': new Howl({
+    src: [RED_APPLE_CRUNCH_SOUND],
+  }),
+  'RED_PIE_SOUND': new Howl({
+    src: [RED_PIE_SOUND],
+  }),
+  'GREEN_APPLE_CRUNCH_SOUND': new Howl({
+    src: [GREEN_APPLE_CRUCH_SOUND],
+  }),
+  'GREEN_PIE_SOUND': new Howl({
+    src: [GREEN_PIE_SOUND],
+  }),
+  'CARBON_TAX_SOUND': new Howl({
+    src: [CARBON_TAX_SOUND],
+  }),
+  'CARBON_DIVIDEND_SOUND': new Howl({
+    src: [CARBON_DIVIDEND_SOUND],
+  }),
+  'GREEN_SUBSIDY_SOUND': new Howl({
+    src: [GREEN_SUBSIDY_SOUND],
+  }),
+  'COLLISON_NEAR_MISS_SOUND': new Howl({
+    src: [COLLISON_NEAR_MISS_SOUND],
+  }),
 }
 
 let canvasWidth = window.innerWidth * 0.80;
@@ -329,16 +367,6 @@ function drawTokens(ctx, tokens) {
   }
 }
 
-function drawHazards(ctx, hazards) {
-  for (let i = 0; i < hazards.length; i++) {
-    const { x, y, hazardType } = hazards[i];
-    const image = HAZARD_IMAGES[hazardType];
-    const xLocation = x * squareLength;
-    const yLocation = y * squareLength;
-    ctx.drawImage(image, xLocation, yLocation, squareLength, squareLength);
-  }
-}
-
 function drawHead(ctx, snake, frameFraction) {
   const head = snake.getHead();
   const snakeState = snake.getState();
@@ -534,26 +562,27 @@ function clearSnake(ctx) {
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 }
 
+/**
+ * Checks if the snake will hit an object or wall (meaning the snake head would be on top of the obstacle's square next frame).
+ * @param {Snanke} snake - the current instance of the snake class.
+ * @returns null if no colision is detected or a string with the type of colision (like "HAZARD_COLLISION") if one is detected
+ */
 function checkCollision(snake) {
   const { x, y, direction } = snake.getHead();
   if (snake.getState() === "INVINCIBLE" || snake.getState() === "INVINCIBLE_FADING") {
-    return false;
+    return null;
   }
   if (x === GAME_WIDTH - 1 && direction === DIRECTIONS.RIGHT) {
-    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
-    return true;
+    return "WALL_COLLISION";
   }
   if (x === 0 && direction === DIRECTIONS.LEFT) {
-    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
-    return true;
+    return "WALL_COLLISION";
   }
   if (y === GAME_HEIGHT - 1 && direction === DIRECTIONS.DOWN) {
-    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
-    return true;
+    return "WALL_COLLISION";
   }
   if (y === 0 && direction === DIRECTIONS.UP) {
-    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
-    return true;
+    return "WALL_COLLISION";
   }
   let newX = -1;
   let newY = -1;
@@ -578,12 +607,11 @@ function checkCollision(snake) {
       break;
   }
   if (snake.contains(newX, newY)) {
-    AUDIO_CLIPS['SNAKE_BUMP_SOUND'].play();
-    return true;
+    return "SNAKE_SELF_COLLISION";
   } else if (snake.containsHazard(newX, newY)) {
-    AUDIO_CLIPS['WALL_BUMP_SOUND'].play();
-    return true;
+    return "HAZARD_COLLISION";
   }
+  return null;
 }
 
 function onKeyDownFactory(snake) {
@@ -623,7 +651,7 @@ function onKeyDownFactory(snake) {
   return onKeyDownCallback;
 }
 
-function drawBackground(backgroundCtx, firstColor, secondColor) {
+function drawCheckerboard(backgroundCtx, firstColor, secondColor) {
   for (let i = 0; i < GAME_HEIGHT; i++) {
     for (let j = 0; j < GAME_WIDTH; j++) {
       if ((i + j) % 2 === 0) {
@@ -644,17 +672,20 @@ class App extends React.Component {
       showingStartScreen: true,
       showingGameOverScreen: false,
       countDownDigit: 0,
+      muted: false,
     };
     this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
     this.gameCtx = null; // gets set in the componentDidMount() method
+    this.lastSoundEffectStartTime = 0; // records the last time a sound effect was played in unix epoch time [ms] (to avoid playing sound effects too frequently)
+    this.fireHazardCount = 0; // counts how many fire hazards are shown.
   }
 
   componentDidMount() {
     const game = document.getElementById('game');
     this.gameCtx = game.getContext('2d');
     this.particlesViz = new ppmVisualizer('particles-viz')
-    this.particlesViz.setParticleCount(200);
 
+    // handle window resize events (and call the handler right away too so everything is sized right from the start)
     window.onresize = () => { this.onWindowResize() }
     this.onWindowResize();
   }
@@ -673,11 +704,37 @@ class App extends React.Component {
 
     this.particlesViz.resizeCanvas(canvasWidth, canvasHeight)
 
-    const scoreContainer = document.getElementById('game-subtitle');
-    scoreContainer.style.width = `${canvasWidth}px`;
+    const gameLayoutContainer = document.getElementById('game-layout-container');
+    gameLayoutContainer.style.width = `${canvasWidth}px`;
 
     this.drawBackground();
     if (this.state.showingStartScreen === false) this.drawSnakeAndItems(0);
+  }
+
+  drawHazards() {
+    let hazards = this.snake.getHazards();
+    let fireCount = 0;
+    let newFireX = 0;
+    let newFireY = 0;
+    for (let i = 0; i < hazards.length; i++) {
+      const { x, y, hazardType } = hazards[i];
+      const image = HAZARD_IMAGES[hazardType];
+      const xLocation = x * squareLength;
+      const yLocation = y * squareLength;
+      this.gameCtx.drawImage(image, xLocation, yLocation, squareLength, squareLength);
+
+      if (hazardType === HAZARD_TYPE.FIRE) {
+        fireCount++;
+        newFireX = xLocation + squareLength / 2;
+        newFireY = yLocation + squareLength / 2;
+      }
+    }
+    if (this.fireHazardCount !== fireCount) {
+      this.fireHazardCount = fireCount;
+      this.particlesViz.setEnabled(true);
+      this.particlesViz.setParticleCount(Math.min(fireCount * 200, 600))
+      this.particlesViz.explodeFromPoint(newFireX, newFireY);
+    }
   }
 
   /**
@@ -687,9 +744,9 @@ class App extends React.Component {
     const background = document.getElementById('background');
     const backgroundCtx = background.getContext('2d');
     if (this.snake.getCarbonTaxed()) {
-      drawBackground(backgroundCtx, '#C6FD77', '#B1EC77');
+      drawCheckerboard(backgroundCtx, '#C6FD77', '#B1EC77');
     } else {
-      drawBackground(backgroundCtx, '#D9E121', '#FCEE23');
+      drawCheckerboard(backgroundCtx, '#D9E121', '#FCEE23');
     }
   }
 
@@ -700,7 +757,7 @@ class App extends React.Component {
   drawSnakeAndItems(frameNum) {
     clearSnake(this.gameCtx);
     drawTokens(this.gameCtx, this.snake.getTokens());
-    drawHazards(this.gameCtx, this.snake.getHazards());
+    this.drawHazards();
     drawHead(this.gameCtx, this.snake, frameNum);
     if (frameNum === 0) {
       drawProperTail(this.gameCtx, this.snake.getTail(), this.snake.getHead());
@@ -722,7 +779,7 @@ class App extends React.Component {
     this.snake.generateToken();
     this.drawBackground();
     this.drawSnakeAndItems(0);
-    this.particlesViz.setParticleCount(this.snake.getConcentration())
+    this.particlesViz.setEnabled(false);
   }
 
   startGame() {
@@ -754,80 +811,204 @@ class App extends React.Component {
     }, 3)
   }
 
+  restartGame() {
+    window.onkeydown = null;
+    window.onmousedown = null;
+    this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
+    this.snake.points = 0;
+    this.snake.concentration = 278;
+    this.fireHazardCount = 0;
+    this.resetGameBoard()
+    this.startCountdown()
+    // update page to reflect reset score & concentration:
+    const scoreElem = document.getElementById('score');
+    if (scoreElem) {
+      scoreElem.innerHTML = this.snake.points;
+    }
+    const concentrationElem = document.getElementById('concentration');
+    if (concentrationElem) {
+      concentrationElem.innerHTML = this.snake.concentration;
+    }
+  }
+
   gameOver() {
+    AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
+    AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
     this.snake.setStateToDead();
     this.drawSnakeAndItems(0)
     this.setState({ showingGameOverScreen: true })
-    window.onkeydown = null;
-    window.onkeydown = () => {
-      window.onkeydown = null;
-      this.snake = new Snake(START_X, START_Y, DEFAULT_SNAKE_LENGTH, GAME_HEIGHT, GAME_WIDTH);
-      this.resetGameBoard()
-      this.startCountdown()
-    };
+    window.onkeydown = (event) => {
+      if (event.key === " ") this.restartGame();
+    }
+    document.getElementById('game-container').onclick = (event) => {
+      document.getElementById('game-container').onclick = null;
+      this.restartGame();
+    }
   }
 
+  /**
+   * handles fading in/out the background music for each of the game states:
+   * CARBON_DIVIDEND_BACKGROUND_SOUND is when the snake eats the parachute icon & becomes invincible
+   * CARBON_TAX_BACKGROUND_SOUND is when the snake eats the tax icon & the board goes green.
+   */
   handleBackgroundSounds() {
-    if (this.snake.getState() === SNAKE_STATES.INVINCIBLE && (!AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing())) {
+    // handle fading in/out the main soundtrack
+    let soundtrackVolume = AUDIO_CLIPS["SOUNDTRACK"].volume()
+    if (this.snake.getCarbonTaxed()) {
+      if (soundtrackVolume === 1) {
+        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, AUDIO_FADE_TIME);
+      }
+    } else if (this.snake.getState() === SNAKE_STATES.INVINCIBLE) {
+      if (soundtrackVolume === 1) {
+        AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, AUDIO_FADE_TIME);
+      }
+    } else {
+      if (soundtrackVolume === 0 || soundtrackVolume === 0.4) {
+        AUDIO_CLIPS['SOUNDTRACK'].fade(soundtrackVolume, 1, AUDIO_FADE_TIME);
+      }
+    }
+
+    // handle playing/stopping the carbon dividend soundtrack
+    const isInvincible = this.snake.getState() === SNAKE_STATES.INVINCIBLE
+    const dividendSoundIsPlaying = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing()
+    const dividendSoundVolume = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].volume()
+    const dividendSoundRate = AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate()
+    if (isInvincible && !dividendSoundIsPlaying) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].volume(1)
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate(1)
       AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].play();
-      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0, 1000);
-      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop()
+    } else if (isInvincible && this.snake.isFading()) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].rate(dividendSoundRate - AUDIO_SLOWING_RATE);
+    } else if (!isInvincible && dividendSoundIsPlaying && dividendSoundVolume === 1) {
+      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].fade(1, 0, AUDIO_FADE_TIME);
+      setTimeout(() => {
+        if (!isInvincible && dividendSoundIsPlaying) AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop();
+      }, AUDIO_FADE_TIME)
     }
-    else if (this.snake.getState() !== SNAKE_STATES.INVINCIBLE && AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing()) {
-      const fadeTime = 1000 // ms
-      AUDIO_CLIPS['SOUNDTRACK'].fade(0, 1, fadeTime);
-      setTimeout(() => { AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop() }, fadeTime)
-    }
-    if (this.snake.getCarbonTaxed() && (!AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing() || AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].playing())) {
+
+    // handle playing/stopping the carbon tax "nature" soundtrack
+    const taxSoundPlaying = AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()
+    const taxSoundVolume = AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].volume()
+    if (this.snake.getCarbonTaxed() && !taxSoundPlaying) {
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].volume(1)
       AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].play();
-      AUDIO_CLIPS['SOUNDTRACK'].fade(1, 0.4, 1000);
-      AUDIO_CLIPS['CARBON_DIVIDEND_BACKGROUND_SOUND'].stop()
+    } else if (!this.snake.getCarbonTaxed() && taxSoundPlaying && taxSoundVolume === 1) {
+      AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].fade(1, 0, AUDIO_FADE_TIME);
+      setTimeout(() => {
+        if (!this.snake.getCarbonTaxed() && taxSoundPlaying) AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop();
+      }, AUDIO_FADE_TIME)
     }
-    else if (!this.snake.getCarbonTaxed() && AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].playing()) {
-      const fadeTime = 1000 // ms
-      AUDIO_CLIPS['SOUNDTRACK'].fade(0.4, 1, fadeTime);
-      setTimeout(() => { AUDIO_CLIPS['CARBON_TAX_BACKGROUND_SOUND'].stop() }, fadeTime)
+  }
+
+  /**
+   * Play the given sound.
+   * @param {String} soundName the name of the sound to play from the AUDIO_CLIPS object
+   * @param {Boolean} force override the MIN_DELAY_BETWEEN_SOUND_EFFECTS check and always play the sound (as long as it isn't already playing).
+   * @returns
+   */
+  playSoundEffect(soundName, force) {
+    let timeNow = new Date().getTime()
+    if (timeNow - this.lastSoundEffectStartTime < MIN_DELAY_BETWEEN_SOUND_EFFECTS && force !== true) { return };
+    if (AUDIO_CLIPS[soundName].playing()) { return };
+    AUDIO_CLIPS[soundName].play()
+    this.lastSoundEffectStartTime = timeNow;
+  }
+
+  playTokenSound(tokenType) {
+    switch (tokenType) {
+      case TOKEN_TYPE.RED_APPLE:
+        this.playSoundEffect('RED_APPLE_CRUNCH_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_APPLE:
+        this.playSoundEffect('GREEN_APPLE_CRUNCH_SOUND');
+        break;
+      case TOKEN_TYPE.RED_PIE:
+        this.playSoundEffect('RED_PIE_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_PIE:
+        this.playSoundEffect('GREEN_PIE_SOUND');
+        break;
+      case TOKEN_TYPE.GREEN_SUBSIDY:
+        this.playSoundEffect('GREEN_SUBSIDY_SOUND');
+        break;
+      case TOKEN_TYPE.CARBON_TAX:
+        this.playSoundEffect('CARBON_TAX_SOUND');
+        break;
+      case TOKEN_TYPE.CARBON_DIVIDEND:
+        this.playSoundEffect('CARBON_DIVIDEND_SOUND');
+        break;
+      default:
+        break;
     }
+  }
+
+  toggleMute() {
+    this.setState({ muted: !this.state.muted })
+    Howler.mute(!this.state.muted);
+    this.drawBackground();
   }
 
   beginGameLoop() {
     let frames = 0;
+    ///------------------ Main Game Loop --------------------------------------------------
     let gameLoopCallback = () => {
+      let collided_obstacle_type = checkCollision(this.snake)
       if (frames === TOTAL_FRAMES_PER_SQUARE) {
-        if (checkCollision(this.snake)) {
+        // == code here only runs when the snake reaches the ending edge of a square. ==
+        if (collided_obstacle_type != null) {
+          if (collided_obstacle_type === "WALL_COLLISION") this.playSoundEffect("WALL_BUMP_SOUND")
+          else if (collided_obstacle_type === "SNAKE_SELF_COLLISION") this.playSoundEffect("SNAKE_BUMP_SOUND")
+          else if (collided_obstacle_type === "HAZARD_COLLISION") this.playSoundEffect("WALL_BUMP_SOUND")
           this.gameOver();
           return;
         }
-        this.snake.move();
+        let tokenConsumed = this.snake.move();
+        this.playTokenSound(tokenConsumed);
         this.drawBackground();
-        this.particlesViz.setParticleCount(this.snake.getConcentration())
+
         frames = 0;
+        // ============================================================================
       }
-      if (!checkCollision(this.snake)) {
+      if (collided_obstacle_type == null) {
         this.drawSnakeAndItems(frames / TOTAL_FRAMES_PER_SQUARE);
         this.handleBackgroundSounds()
+      } else {
+        // ^ this else implies the player is about to run into some obstacle.
+        this.playSoundEffect("COLLISON_NEAR_MISS_SOUND")
       }
       frames += 1;
       window.requestAnimationFrame(gameLoopCallback);
     }
+    ///------------ End Main Game Loop (line below starts it for the first time) -----------------------
     window.requestAnimationFrame(gameLoopCallback);
   }
 
   render() {
     return (
       <article className="App">
-        <h1 className={'title'}>Snakes and Apples</h1>
-        <section className={'subtitle'} id={'game-subtitle'}>
-          <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
-          <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
-        </section>
-        <div id={'game-container'}>
-          <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
-          <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
-          <div id={'particles-viz'} />
-          {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
-          {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
-          {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
+        <div id="game-layout-container">
+          <section className={'title-bar'}>
+            <img className={'mute-button'} onClick={() => { this.toggleMute() }} alt={this.state.muted ? "unmute" : "mute"} src={this.state.muted ? MUTE_ICON : UNMUTE_ICON} role="button"></img>
+            <h1 className={'title'}>Snakes and Apples </h1>
+            <div className={'learn-links'}>
+              <a href="https://docs.google.com/document/u/1/d/e/2PACX-1vRTTFMQzqHk4kxRdp1Q_66Ug-MkLma9_HTyk-2JrtDeKG_z8n_5sg3vAuaCHtTAQxsMK72lNx3IheEN/pub" target="_blank" rel="noopener noreferrer">Learn More</a>
+              <br></br>
+              <a href="https://www.artworksforchange.org" target="_blank" rel="noopener noreferrer">Credits</a>
+            </div>
+          </section>
+          <section className={'subtitle'} id={'game-subtitle'}>
+            <h2 className={'score-container'}>Score: <span id={'score'}>0</span></h2>
+            <h2 className={'concentration-container'}>Concentration: <span id={'concentration'}>278</span> ppm</h2>
+
+          </section>
+          <div id={'game-container'}>
+            <canvas id={'background'} className={'background'} width={canvasWidth} height={canvasHeight} />
+            <canvas id={'game'} className={'gameboard'} width={canvasWidth} height={canvasHeight} />
+            <div id={'particles-viz'} />
+            {this.state.showingStartScreen && <StartScreen onPlayClicked={() => { this.startCountdown() }}></StartScreen>}
+            {this.state.showingGameOverScreen && <GameOverScreen></GameOverScreen>}
+            {(this.state.countDownDigit > 0) && <h1 className='countdown-digit' >{this.state.countDownDigit}</h1>}
+          </div>
         </div>
       </article>
     );

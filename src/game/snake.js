@@ -1,37 +1,4 @@
-import { Howl } from "howler"
-
-import RED_APPLE_CRUNCH_SOUND from '../assets/sounds/red_apple_crunch_sound.mp3';
-import RED_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
-import GREEN_APPLE_CRUCH_SOUND from '../assets/sounds/green_apple_crunch_sound.mp3';
-import GREEN_PIE_SOUND from '../assets/sounds/green_pie_sound.mp3';
-import GREEN_SUBSIDY_SOUND from '../assets/sounds/green_subsidy_sound.mp3';
-import CARBON_TAX_SOUND from '../assets/sounds/carbon_tax_sound.wav';
-import CARBON_DIVIDEND_SOUND from '../assets/sounds/carbon_dividend_sound.mp3';
-
-
-let AUDIO_CLIPS = {
-  'RED_APPLE_CRUNCH_SOUND': new Howl({
-    src: [RED_APPLE_CRUNCH_SOUND],
-  }),
-  'RED_PIE_SOUND': new Howl({
-    src: [RED_PIE_SOUND],
-  }),
-  'GREEN_APPLE_CRUNCH_SOUND': new Howl({
-    src: [GREEN_APPLE_CRUCH_SOUND],
-  }),
-  'GREEN_PIE_SOUND': new Howl({
-    src: [GREEN_PIE_SOUND],
-  }),
-  'CARBON_TAX_SOUND': new Howl({
-    src: [CARBON_TAX_SOUND],
-  }),
-  'CARBON_DIVIDEND_SOUND': new Howl({
-    src: [CARBON_DIVIDEND_SOUND],
-  }),
-  'GREEN_SUBSIDY_SOUND': new Howl({
-    src: [GREEN_SUBSIDY_SOUND],
-  }),
-}
+const DEBUG_CHEATS_ON = false;
 
 /** Enum repsenting the token type. */
 export const TOKEN_TYPE = {
@@ -50,9 +17,9 @@ export const HAZARD_TYPE = {
   'FLOOD': 10,
 };
 
+// number of checkerboard/game board squares in the y & x directions
 export const GAME_HEIGHT = 16;
 export const GAME_WIDTH = 16;
-
 
 /** Enum representing score for type of token. */
 export const TOKEN_SCORE = {
@@ -130,6 +97,7 @@ export class Snake {
     this.prevSnake = null;
     this.points = 0;
     this.concentration = 278;
+    if (DEBUG_CHEATS_ON) this.concentration = 400;
     this.tokens = [];
     this.hazards = [];
     this.moveNumber = 0;
@@ -494,7 +462,7 @@ export class Snake {
 
     // GREEN SUBSIDY rules
     const greenSubsidyExists = this.getNumTokensOfType(TOKEN_TYPE.GREEN_SUBSIDY) >= 1;
-    if (this.concentration > 380 && this.moveNumber > this.lastGreenSubsidy + 250 && coordinates.length > 0 && !greenSubsidyExists) {
+    if (!greenSubsidyExists && (DEBUG_CHEATS_ON || (this.concentration > 380 && this.moveNumber > this.lastGreenSubsidy + 250 && coordinates.length > 0))) {
       const { x, y } = coordinates.pop();
       this.addToken(x, y, TOKEN_TYPE.GREEN_SUBSIDY);
       this.lastGreenSubsidy = this.moveNumber;
@@ -502,7 +470,7 @@ export class Snake {
 
     // CARBON TAX rules
     const carbonTaxExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_TAX) >= 1;
-    if (this.concentration > 350 && this.moveNumber > this.lastCarbonTax + 200 && coordinates.length > 0 && !carbonTaxExists) {
+    if (!carbonTaxExists && (DEBUG_CHEATS_ON || (this.concentration > 350 && this.moveNumber > this.lastCarbonTax + 200 && coordinates.length > 0))) {
       const { x, y } = coordinates.pop();
       this.addToken(x, y, TOKEN_TYPE.CARBON_TAX);
       this.lastCarbonTax = this.moveNumber;
@@ -510,14 +478,16 @@ export class Snake {
 
     // CARBON DIVIDEND rules
     const carbonDividendExists = this.getNumTokensOfType(TOKEN_TYPE.CARBON_DIVIDEND) >= 1;
-    if (this.concentration > 360 && this.moveNumber > this.lastCarbonDividend + 500 && coordinates.length > 0 && !carbonDividendExists) {
+    if (!carbonDividendExists && (DEBUG_CHEATS_ON || (this.concentration > 360 && this.moveNumber > this.lastCarbonDividend + 500 && coordinates.length > 0 && !carbonDividendExists))) {
       const { x, y } = coordinates.pop();
       this.addToken(x, y, TOKEN_TYPE.CARBON_DIVIDEND);
       this.lastCarbonDividend = this.moveNumber;
     }
   }
 
-  /** Moves the snake in the direction it is currently moving in. */
+  /** Moves the snake in the direction it is currently moving in.
+   * @returns the token type that was consumed (null if nothing was consumed in this move).
+   */
   move() {
     this.prevSnake = this.snake.slice();
     const head = this.getHead();
@@ -628,24 +598,17 @@ export class Snake {
     const tokenType = this.consumeToken(newHead.x, newHead.y);
     switch (tokenType) {
       case TOKEN_TYPE.RED_APPLE:
-        // play crunch sound:
-        AUDIO_CLIPS['RED_APPLE_CRUNCH_SOUND'].play();
         this.generateToken();
         break;
       case TOKEN_TYPE.RED_PIE:
-        // play crunch sound:
-        AUDIO_CLIPS['RED_PIE_SOUND'].play();
         this.generateToken();
         break;
       case TOKEN_TYPE.GREEN_APPLE:
-        // play crunch sound:
-        AUDIO_CLIPS['GREEN_APPLE_CRUNCH_SOUND'].play();
         this.generateToken();
         break;
       case TOKEN_TYPE.GREEN_PIE:
         this.snake.pop();
         this.generateToken();
-        AUDIO_CLIPS['GREEN_PIE_SOUND'].play();
         break;
       case TOKEN_TYPE.GREEN_SUBSIDY:
         const poppingLevel = Math.floor(0.4 * this.snake.length);
@@ -655,7 +618,6 @@ export class Snake {
           counter += 1;
         }
         this.generateToken(false);
-        AUDIO_CLIPS['GREEN_SUBSIDY_SOUND'].play();
         break;
       case TOKEN_TYPE.CARBON_TAX:
         this.snake.pop();
@@ -672,7 +634,6 @@ export class Snake {
         this.carbonTaxed = true;
         this.carbonTaxCount = 0;
         this.generateToken();
-        AUDIO_CLIPS['CARBON_TAX_SOUND'].play();
         break;
       case TOKEN_TYPE.CARBON_DIVIDEND:
         this.snake.pop();
@@ -680,12 +641,12 @@ export class Snake {
         this.invincibleModeNumber = 0;
         this.setStateToInvincible();
         this.fading = false;
-        AUDIO_CLIPS['CARBON_DIVIDEND_SOUND'].play();
         break;
       default:
         this.snake.pop();
         break;
     }
     this.generateHazard();
+    return tokenType;
   }
 }
